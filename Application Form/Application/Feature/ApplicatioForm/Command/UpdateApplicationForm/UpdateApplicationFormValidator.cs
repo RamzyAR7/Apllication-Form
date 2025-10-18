@@ -1,0 +1,62 @@
+﻿using Application_Form.Domain.Constant;
+using FluentValidation;
+
+namespace Application_Form.Application.Feature.ApplicatioForm.Command.UpdateApplicationForm
+{
+    public class UpdateApplicationFormValidator : AbstractValidator<UpdateApplicationFormCommand>
+    {
+        public UpdateApplicationFormValidator()
+        {
+            RuleFor(x => x.Id)
+                .NotEmpty().WithMessage("Application ID is required.");
+
+            RuleFor(x => x.Dto.ApplicationName)
+                .NotEmpty().WithMessage("ApplicationName is required.")
+                .MaximumLength(200).WithMessage("ApplicationName must be at most 200 characters.");
+
+            RuleFor(x => x.Dto.ApplicationDescription)
+                .NotEmpty().WithMessage("ApplicationDescription is required.")
+                .MaximumLength(1000).WithMessage("ApplicationDescription must be at most 1000 characters.");
+
+            RuleFor(x => x.Dto.EmailAddress)
+                .NotEmpty().WithMessage("EmailAddress is required.")
+                .EmailAddress().WithMessage("EmailAddress must be a valid email address.")
+                .MaximumLength(255).WithMessage("EmailAddress must be at most 255 characters.");
+
+            RuleFor(x => x.Dto.ApplicationType)
+                .NotEmpty().WithMessage("ApplicationType is required.");
+
+            RuleFor(x => x.Dto.RedirectUri)
+                .MaximumLength(500).WithMessage("RedirectUri must be at most 500 characters.")
+                .When(x => !string.IsNullOrWhiteSpace(x.Dto.RedirectUri));
+
+            RuleFor(x => x.Dto.RedirectUri)
+                .Must(uri => Uri.IsWellFormedUriString(uri, UriKind.Absolute))
+                .WithMessage("RedirectUri must be a valid URL.")
+                .When(x => !string.IsNullOrWhiteSpace(x.Dto.RedirectUri));
+
+            RuleFor(x => x.Dto.Environment)
+                .NotEmpty().WithMessage("Environment is required.")
+                .Must(env => Enum.GetNames(typeof(ApiEnvironment)).Contains(env))
+                .WithMessage("Invalid environment. Must be Sandbox, Production, or Both.");
+
+            RuleFor(x => x.Dto.ExpectedRequestVolume)
+                .GreaterThanOrEqualTo(0).WithMessage("ExpectedRequestVolume must be a non-negative integer.")
+                .When(x => x.Dto.ExpectedRequestVolume.HasValue);
+
+            RuleFor(x => x.Dto.PrivacyPolicyUrl)
+                .Cascade(CascadeMode.Stop)
+                .Must(uri => Uri.IsWellFormedUriString(uri, UriKind.Absolute)).WithMessage("PrivacyPolicyUrl must be a valid URL.")
+                .When(x => !string.IsNullOrWhiteSpace(x.Dto.PrivacyPolicyUrl));
+
+            RuleFor(x => x.Dto.TechnicalContactName)
+                .MaximumLength(100).WithMessage("TechnicalContactName must be at most 100 characters.")
+                .When(x => !string.IsNullOrWhiteSpace(x.Dto.TechnicalContactName));
+
+            RuleFor(x => x.Dto.TechnicalContactEmail)
+                .EmailAddress().WithMessage("TechnicalContactEmail must be a valid email address.")
+                .MaximumLength(150).WithMessage("TechnicalContactEmail must be at most 150 characters.")
+                .When(x => !string.IsNullOrWhiteSpace(x.Dto.TechnicalContactEmail));
+        }
+    }
+}

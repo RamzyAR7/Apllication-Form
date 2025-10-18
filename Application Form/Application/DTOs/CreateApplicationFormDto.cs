@@ -1,0 +1,38 @@
+﻿using Application_Form.Domain.Constant;
+using System.ComponentModel.DataAnnotations;
+
+namespace Application_Form.Application.DTOs
+{
+    public class CreateApplicationFormDto
+    {
+        public string ApplicationName { get; set; }
+
+        public string ApplicationDescription { get; set; }
+
+        public string EmailAddress { get; set; }
+
+        public string OrganizationName { get; set; }
+
+        public int? CountryId { get; set; }
+
+        public string ApplicationType { get; set; }
+
+        public string? RedirectUri { get; set; }
+
+        public string Environment { get; set; }
+
+        public int? ExpectedRequestVolume { get; set; }
+
+        public bool AcceptTerms { get; set; }
+
+        public string? PrivacyPolicyUrl { get; set; }
+
+        public string? DataRetentionDescription { get; set; }
+
+        public string? TechnicalContactName { get; set; }
+
+        public string? TechnicalContactEmail { get; set; }
+
+        public Guid ClientId { get; set; }
+    }
+}
