@@ -10,8 +10,7 @@ namespace Application_Form.SwaggerDocs
             return new Result<CustomEmptyResult>
             {
                 Success = false,
-                Message = "Error Message",
-                Data = null
+                Message = "Error Message"
             };
         }
     }

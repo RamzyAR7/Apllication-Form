@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Net;
-using System.Net.Mail;
-using System.Net;
-using System.Net.Mail;
 using Application_Form.Domain.Constant;
 using FluentValidation;
 
@@ -24,20 +20,7 @@ namespace Application_Form.Application.Feature.ApplicatioForm.Command.CreateAppl
             RuleFor(x => x.Dto.EmailAddress)
                 .NotEmpty().WithMessage("EmailAddress is required.")
                 .EmailAddress().WithMessage("EmailAddress must be a valid email address.")
-                .MaximumLength(255).WithMessage("EmailAddress must be at most 255 characters.")
-                .MustAsync(async (command, email, ct) =>
-                {
-                    try
-                    {
-                        var host = new MailAddress(email).Host;
-                        await Dns.GetHostEntryAsync(host);
-                        return true;
-                    }
-                    catch
-                    {
-                        return false;
-                    }
-                }).WithMessage("Email domain does not exist.");
+                .MaximumLength(255).WithMessage("EmailAddress must be at most 255 characters.");
 
             RuleFor(x => x.Dto.ApplicationType)
                 .NotEmpty().WithMessage("ApplicationType is required.")
@@ -78,21 +61,7 @@ namespace Application_Form.Application.Feature.ApplicatioForm.Command.CreateAppl
             RuleFor(x => x.Dto.TechnicalContactEmail)
                 .EmailAddress().WithMessage("TechnicalContactEmail must be a valid email address.")
                 .MaximumLength(150).WithMessage("TechnicalContactEmail must be at most 150 characters.")
-                .When(x => !string.IsNullOrWhiteSpace(x.Dto.TechnicalContactEmail))
-                .MustAsync(async (command, email, ct) =>
-                {
-                    if (string.IsNullOrWhiteSpace(email)) return true;
-                    try
-                    {
-                        var host = new MailAddress(email).Host;
-                        await Dns.GetHostEntryAsync(host);
-                        return true;
-                    }
-                    catch
-                    {
-                        return false;
-                    }
-                }).WithMessage("Technical contact email domain does not exist.");
+                .When(x => !string.IsNullOrWhiteSpace(x.Dto.TechnicalContactEmail));
 
             RuleFor(x => x.Dto.OrganizationName)
                 .MaximumLength(150).WithMessage("OrganizationName must be at most 150 characters.")

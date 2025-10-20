@@ -11,7 +11,7 @@ namespace Application_Form.SwaggerDocs
             {
                 Success = true,
                 Message = string.Empty,
-                Data = null
+                Data = new CustomEmptyResult()
             };
         }
     }

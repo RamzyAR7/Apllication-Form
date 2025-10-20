@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Application_Form.Application.Feature.ApplicatioForm.Command.CreateApplicationForm
 {
-    public class CreateApplicationFormHandler : IRequestHandler<CreateApplicationFormCommand, Result<ApplicationFormListResponseDto>>
+    public class CreateApplicationFormHandler : IRequestHandler<CreateApplicationFormCommand, Result<CustomEmptyResult>>
     {
         private readonly IApplicationFormRepository _repository;
         private readonly IClientRepository _clientRepository;
@@ -23,7 +23,7 @@ namespace Application_Form.Application.Feature.ApplicatioForm.Command.CreateAppl
             _logger = logger;
         }
 
-        public async Task<Result<ApplicationFormListResponseDto>> Handle(CreateApplicationFormCommand request, CancellationToken cancellationToken)
+        public async Task<Result<CustomEmptyResult>> Handle(CreateApplicationFormCommand request, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Creating application form for client {ClientId}", request.Dto?.ClientId);
             try
@@ -32,14 +32,14 @@ namespace Application_Form.Application.Feature.ApplicatioForm.Command.CreateAppl
                 if (client == null)
                 {
                     _logger.LogWarning("Client {ClientId} not found", request.Dto.ClientId);
-                    return Result<ApplicationFormListResponseDto>.Failure("Client not found.");
+                    return Result<CustomEmptyResult>.Failure("Client not found.");
                 }
                 var existedApp = await _repository.GetByNameAndClientIdAsync(request.Dto.ApplicationName, request.Dto.ClientId);
 
                 if(existedApp != null)
                 {
                     _logger.LogWarning("Application with name {AppName} already exists for client {ClientId}", request.Dto.ApplicationName, request.Dto.ClientId);
-                    return Result<ApplicationFormListResponseDto>.Failure("An application with the same name already exists for this client.");
+                    return Result<CustomEmptyResult>.Failure("An application with the same name already exists for this client.");
                 }
 
                 var entity = _mapper.Map<ApplicationForm>(request.Dto);
@@ -50,12 +50,12 @@ namespace Application_Form.Application.Feature.ApplicatioForm.Command.CreateAppl
                 await _repository.AddAsync(entity);
                 await _repository.SaveChangesAsync();
                 _logger.LogInformation("Created application {AppId}", entity.Id);
-                return Result<ApplicationFormListResponseDto>.SuccessResult(null);
+                return Result<CustomEmptyResult>.SuccessResult(new CustomEmptyResult());
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error creating application for client {ClientId}", request.Dto?.ClientId);
-                return Result<ApplicationFormListResponseDto>.Failure($"Error creating application: {ex.Message}");
+                return Result<CustomEmptyResult>.Failure($"Error creating application: {ex.Message}");
             }
         }
     }

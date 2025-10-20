@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Application_Form.Application.Feature.ApplicatioForm.Command.ChangeApplicationStatus
 {
-    public class ChangeApplicationStatusHandler : IRequestHandler<ChangeApplicationStatusCommand, Result<ApplicationFormListResponseDto>>
+    public class ChangeApplicationStatusHandler : IRequestHandler<ChangeApplicationStatusCommand, Result<CustomEmptyResult>>
     {
         private readonly IApplicationFormRepository _repository;
         private readonly IApiCredentialService _apiCredentialService;
@@ -24,7 +24,7 @@ namespace Application_Form.Application.Feature.ApplicatioForm.Command.ChangeAppl
             _logger = logger;
         }
 
-        public async Task<Result<ApplicationFormListResponseDto>> Handle(ChangeApplicationStatusCommand request, CancellationToken cancellationToken)
+        public async Task<Result<CustomEmptyResult>> Handle(ChangeApplicationStatusCommand request, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Starting status change for ApplicationId: {AppId} → Target: {TargetStatus}", request.Id, request.Dto?.NewStatus);
 
@@ -34,7 +34,7 @@ namespace Application_Form.Application.Feature.ApplicatioForm.Command.ChangeAppl
                 if (entity == null)
                 {
                     _logger.LogWarning("Application not found. Id: {AppId}", request.Id);
-                    return Result<ApplicationFormListResponseDto>.Failure("Application not found.");
+                    return Result<CustomEmptyResult>.Failure("Application not found.");
                 }
                 if (entity.ExpirationDate <= DateOnly.FromDateTime(DateTime.UtcNow) && entity.IsActive == true)
                 {
@@ -43,7 +43,7 @@ namespace Application_Form.Application.Feature.ApplicatioForm.Command.ChangeAppl
                     _repository.Update(entity);
                     _logger.LogInformation("Application {AppId} has expired. Updated status to Expired and set IsActive to false.", request.Id);
                     await _repository.SaveChangesAsync();
-                    return Result<ApplicationFormListResponseDto>.Failure("Application has expired - no status changes allowed.");
+                    return Result<CustomEmptyResult>.Failure("Application has expired - no status changes allowed.");
                 }
                 var current = entity.ApprovalStatus;
                 var target = request.Dto?.NewStatus;
@@ -52,20 +52,20 @@ namespace Application_Form.Application.Feature.ApplicatioForm.Command.ChangeAppl
                 if (string.Equals(current, target, StringComparison.OrdinalIgnoreCase))
                 {
                     _logger.LogInformation("ApplicationId: {AppId} already in status '{Status}', no change required.", request.Id, target);
-                    return Result<ApplicationFormListResponseDto>.SuccessResult(null);
+                    return Result<CustomEmptyResult>.SuccessResult(new CustomEmptyResult());
                 }
 
                 bool isExpired = entity.ExpirationDate.HasValue && entity.ExpirationDate.Value < DateOnly.FromDateTime(DateTime.UtcNow);
                 if (isExpired) {
                     _logger.LogInformation("ApplicationId: {AppId} is expired as of {ExpirationDate}. No status changes allowed.", request.Id, entity.ExpirationDate.Value);
-                    return Result<ApplicationFormListResponseDto>.Failure("Application is expired; no status changes allowed.");
+                    return Result<CustomEmptyResult>.Failure("Application is expired; no status changes allowed.");
                 }
 
                 // check allowed transitions
                 if (!IsTransitionAllowed(current, target))
                 {
                     _logger.LogWarning("Invalid transition attempt from '{From}' to '{To}' for ApplicationId: {AppId}", current, target, request.Id);
-                    return Result<ApplicationFormListResponseDto>.Failure($"Transition from '{current}' to '{target}' is not allowed.");
+                    return Result<CustomEmptyResult>.Failure($"Transition from '{current}' to '{target}' is not allowed.");
                 }
 
                 _logger.LogInformation("Processing transition from '{From}' to '{To}' for ApplicationId: {AppId}", current, target, request.Id);
@@ -89,7 +89,7 @@ namespace Application_Form.Application.Feature.ApplicatioForm.Command.ChangeAppl
 
                     default:
                         _logger.LogWarning("Unsupported target status '{Target}' for ApplicationId: {AppId}", target, request.Id);
-                        return Result<ApplicationFormListResponseDto>.Failure("Unsupported target status.");
+                        return Result<CustomEmptyResult>.Failure("Unsupported target status.");
                 }
 
                 _repository.Update(entity);
@@ -97,12 +97,12 @@ namespace Application_Form.Application.Feature.ApplicatioForm.Command.ChangeAppl
 
                 _logger.LogInformation("ApplicationId: {AppId} status successfully changed to '{Status}' at {Time}", request.Id, target, DateTime.UtcNow);
 
-                return Result<ApplicationFormListResponseDto>.SuccessResult(null);
+                return Result<CustomEmptyResult>.SuccessResult(new CustomEmptyResult());
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error changing status for ApplicationId: {AppId}", request.Id);
-                return Result<ApplicationFormListResponseDto>.Failure($"Change application status failed: {ex.Message}");
+                return Result<CustomEmptyResult>.Failure($"Change application status failed: {ex.Message}");
             }
         }
 

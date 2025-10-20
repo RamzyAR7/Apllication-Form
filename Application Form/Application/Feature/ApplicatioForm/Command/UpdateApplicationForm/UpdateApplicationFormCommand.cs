@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Application_Form.Application.Feature.ApplicatioForm.Command.UpdateApplicationForm
 {
-    public class UpdateApplicationFormCommand : IRequest<Result<ApplicationFormListResponseDto>>
+    public class UpdateApplicationFormCommand : IRequest<Result<CustomEmptyResult>>
     {
         public Guid Id { get; set; }
         public UpdateApplicationFormDto Dto { get; set; }

@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Application_Form.Application.Feature.ApplicatioForm.Command.DeleteApplication
 {
-    public class DeleteApplicationCommand : IRequest<Result<ApplicationFormListResponseDto>>
+    public class DeleteApplicationCommand : IRequest<Result<CustomEmptyResult>>
     {
         public Guid Id { get; set; }
 

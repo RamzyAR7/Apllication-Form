@@ -18,7 +18,7 @@ namespace Application_Form.Application.Feature.ApplicatioForm.Command.ChangeAppl
 
             When(x => x.Dto != null, () =>
             {
-                var allowedStatuses = Enum.GetNames(typeof(Status)).Where(n => n != nameof(Status.Pending));
+                var allowedStatuses = Enum.GetNames(typeof(Status)).Where(n => n != nameof(Status.Expired));
                 var allowedPattern = $"^({string.Join("|", allowedStatuses)})$";
 
                 RuleFor(x => x.Dto.NewStatus)

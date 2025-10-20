@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Application_Form.Application.Feature.ApplicatioForm.Command.RenewApplicationCredentials
 {
-    public class RenewApplicationCredentialsCommand : IRequest<Result<ApplicationFormListResponseDto>>
+    public class RenewApplicationCredentialsCommand : IRequest<Result<CustomEmptyResult>>
     {
         public Guid Id { get; set; }
 

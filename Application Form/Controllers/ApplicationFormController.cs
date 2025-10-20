@@ -132,13 +132,13 @@ namespace Application_Form.Controllers
         /// <returns>Returns 200 Ok on success.</returns>
         /// <response code="200">Application updated successfully. No content is returned.</response>
         /// <response code="400">Invalid update request or validation failed.</response>
-        [ProducesResponseType(typeof(Result<ApplicationFormListResponseDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Result<CustomEmptyResult>), StatusCodes.Status200OK)]
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(OkRequestExample))]
         //===========================================
         [ProducesResponseType(typeof(Result<CustomEmptyResult>), StatusCodes.Status400BadRequest)]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestExample))]
         [HttpPut("application/{id:Guid}")]
-        public async Task<ActionResult<Result<ApplicationFormListResponseDto>>> UpdateApplicationForm(Guid id, [FromBody] UpdateApplicationFormDto dto)
+        public async Task<ActionResult<Result<CustomEmptyResult>>> UpdateApplicationForm(Guid id, [FromBody] UpdateApplicationFormDto dto)
         {
             var command = new UpdateApplicationFormCommand(id, dto);
             var result = await _mediator.Send(command);
@@ -163,7 +163,7 @@ namespace Application_Form.Controllers
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestExample))]
 
         [HttpPost("application")]
-        public async Task<ActionResult< Result<ApplicationFormListResponseDto>>> CreateApplicationForm([FromBody] CreateApplicationFormDto dto)
+        public async Task<ActionResult< Result<CustomEmptyResult>>> CreateApplicationForm([FromBody] CreateApplicationFormDto dto)
         {
             var command = new CreateApplicationFormCommand(dto);
             var result = await _mediator.Send(command);
@@ -187,7 +187,7 @@ namespace Application_Form.Controllers
         [ProducesResponseType(typeof(Result<CustomEmptyResult>), StatusCodes.Status400BadRequest)]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestExample))]
         [HttpPatch("application/{id:Guid}/status")]
-        public async Task<ActionResult<Result<ApplicationFormListResponseDto>>> ChangeApplicationStatus(Guid id, [FromBody] ChangeApplicationStatusDto dto)
+        public async Task<ActionResult<Result<CustomEmptyResult>>> ChangeApplicationStatus(Guid id, [FromBody] ChangeApplicationStatusDto dto)
         {
             var command = new ChangeApplicationStatusCommand(id, dto);
             var result = await _mediator.Send(command);
@@ -210,7 +210,7 @@ namespace Application_Form.Controllers
         [ProducesResponseType(typeof(Result<CustomEmptyResult>), StatusCodes.Status400BadRequest)]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestExample))]
         [HttpPatch("application/{id:Guid}/renew-credentials")]
-        public async Task<ActionResult<Result<ApplicationFormListResponseDto>>> RenewApplicationCredentials(Guid id)
+        public async Task<ActionResult<Result<CustomEmptyResult>>> RenewApplicationCredentials(Guid id)
         {
             var command = new RenewApplicationCredentialsCommand(id);
             var result = await _mediator.Send(command);
@@ -234,7 +234,7 @@ namespace Application_Form.Controllers
         [ProducesResponseType(typeof(Result<CustomEmptyResult>), StatusCodes.Status400BadRequest)]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestExample))]
         [HttpPatch("application/{id:Guid}/renew-expiration")]
-        public async Task<ActionResult<Result<ApplicationFormListResponseDto>>> RenewApplicationExpirationDate(Guid id, [FromBody] RenewApplicationExpirationDateDto dto)
+        public async Task<ActionResult<Result<CustomEmptyResult>>> RenewApplicationExpirationDate(Guid id, [FromBody] RenewApplicationExpirationDateDto dto)
         {
             var command = new RenewApplicationExpirationDateCommand(id, dto.NewExpirationDate);
             var result = await _mediator.Send(command);
@@ -256,7 +256,7 @@ namespace Application_Form.Controllers
         [ProducesResponseType(typeof(Result<CustomEmptyResult>), StatusCodes.Status400BadRequest)]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestExample))]
         [HttpDelete("application/{id:Guid}")]
-        public async Task<ActionResult<Result<object>>> DeleteApplication(Guid id)
+        public async Task<ActionResult<Result<CustomEmptyResult>>> DeleteApplication(Guid id)
         {
             var command = new DeleteApplicationCommand(id);
             var result = await _mediator.Send(command);
