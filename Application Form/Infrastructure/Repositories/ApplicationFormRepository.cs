@@ -23,6 +23,13 @@ namespace Application_Form.Infrastructure.Repositories
             return await _context.ApplicationForms
                 .Include(a => a.Client)
                 .FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted);
+
+        }
+
+        public async Task<ApplicationForm?> GetByNameAndClientIdAsync(string applicationName, Guid clientId)
+        {
+            return await _context.ApplicationForms
+                .FirstOrDefaultAsync(a => a.ApplicationName == applicationName && a.ClientId == clientId && !a.IsDeleted);
         }
 
         public async Task<PaginatedList<ApplicationForm>> GetPagedApplicationsAsync(int page, int pageSize, string sortBy, string sortOrder, string status)

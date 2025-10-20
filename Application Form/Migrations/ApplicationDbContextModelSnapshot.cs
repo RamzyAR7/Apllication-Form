@@ -41,6 +41,9 @@ namespace Application_Form.Migrations
                     b.Property<string>("ApiClientSecret")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ApiDocsUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ApiKey")
                         .HasColumnType("nvarchar(max)");
 
@@ -51,8 +54,8 @@ namespace Application_Form.Migrations
 
                     b.Property<string>("ApplicationName")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("ApplicationType")
                         .IsRequired()
@@ -144,6 +147,10 @@ namespace Application_Form.Migrations
                     b.HasIndex("IsActive");
 
                     b.HasIndex("IsDeleted");
+
+                    b.HasIndex("ApplicationName", "ClientId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_ApplicationForm_Name_ClientId");
 
                     b.ToTable("ApplicationForms", (string)null);
                 });

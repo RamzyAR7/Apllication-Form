@@ -15,7 +15,12 @@ namespace Application_Form.Infrastructure.Configurations
             #region Required Fields
             builder.Property(af => af.ApplicationName)
                 .IsRequired()
-                .HasMaxLength(200);
+                .HasMaxLength(100);
+
+            builder.HasIndex(af => new { af.ApplicationName, af.ClientId})
+                .HasDatabaseName("IX_ApplicationForm_Name_ClientId")
+                .IsUnique();
+
             builder.Property(af => af.ApplicationDescription)
                 .IsRequired()
                 .HasMaxLength(1000);
@@ -32,10 +37,10 @@ namespace Application_Form.Infrastructure.Configurations
                 .IsRequired()
                 .HasMaxLength(50);
 
-            builder.Property( af => af.AcceptTerms)
+            builder.Property(af => af.AcceptTerms)
                 .IsRequired();
 
-            builder.Property( af => af.ClientId)
+            builder.Property(af => af.ClientId)
                 .IsRequired();
 
             // Indexes  
@@ -49,13 +54,13 @@ namespace Application_Form.Infrastructure.Configurations
             #endregion
 
             #region Optional Fields
-            builder.Property( af => af.OrganizationName).HasMaxLength(150);
-            builder.Property( af => af.RedirectUri).HasMaxLength(500);
-            builder.Property( af => af.PrivacyPolicyUrl).HasMaxLength(300);
-            builder.Property( af => af.DataRetentionDescription).HasMaxLength(500);
-            builder.Property( af => af.TechnicalContactName).HasMaxLength(100);
-            builder.Property( af => af.TechnicalContactEmail).HasMaxLength(150);
-            builder.Property( af => af.AdminNotes).HasMaxLength(500);
+            builder.Property(af => af.OrganizationName).HasMaxLength(150);
+            builder.Property(af => af.RedirectUri).HasMaxLength(500);
+            builder.Property(af => af.PrivacyPolicyUrl).HasMaxLength(300);
+            builder.Property(af => af.DataRetentionDescription).HasMaxLength(500);
+            builder.Property(af => af.TechnicalContactName).HasMaxLength(100);
+            builder.Property(af => af.TechnicalContactEmail).HasMaxLength(150);
+            builder.Property(af => af.AdminNotes).HasMaxLength(500);
             #endregion
 
             #region System Fields
@@ -64,10 +69,10 @@ namespace Application_Form.Infrastructure.Configurations
                 .HasMaxLength(20)
                 .HasDefaultValue(Status.Pending.ToString());
 
-            builder.Property( af => af.CreatedAt)
+            builder.Property(af => af.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-            builder.Property( af => af.IsDeleted)
+            builder.Property(af => af.IsDeleted)
                 .HasDefaultValue(false);
             builder.Property(af => af.IsActive)
                 .HasDefaultValue(false);

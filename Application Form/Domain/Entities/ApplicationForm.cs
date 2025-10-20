@@ -33,6 +33,7 @@ namespace Application_Form.Domain.Entities
         public DateOnly? ExpirationDate { get; set; }
         public Guid ClientId { get; set; }
         public string? AdminNotes { get; set; }
+        public string? ApiDocsUrl { get; set; }
 
         // Navigation property
         public Client? Client { get; set; }

@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Application_Form.Application.Feature.ApplicatioForm.Command.CreateApplicationForm
 {
-    public class CreateApplicationFormCommand : IRequest<Result>
+    public class CreateApplicationFormCommand : IRequest<Result<ApplicationFormListResponseDto>>
     {
         public CreateApplicationFormDto Dto { get; set; }
 

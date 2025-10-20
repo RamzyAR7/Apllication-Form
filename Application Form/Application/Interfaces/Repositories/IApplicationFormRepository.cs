@@ -7,6 +7,7 @@ namespace Application_Form.Application.Interfaces.Repositories
     {
         // Queries
         Task<ApplicationForm?> GetByIdAsync(Guid id);
+        Task<ApplicationForm?> GetByNameAndClientIdAsync(string applicationName, Guid clientId);
         Task<PaginatedList<ApplicationForm>> GetPagedApplicationsAsync(
             int page,
             int pageSize,
@@ -19,7 +20,6 @@ namespace Application_Form.Application.Interfaces.Repositories
             string sortBy,
             string sortOrder,
             string status);
-
         // Commands
         Task AddAsync(ApplicationForm form);
         void Update(ApplicationForm form);

@@ -2,13 +2,16 @@
 using Application_Form.Application.Interfaces.Repositories;
 using Application_Form.Application.Models;
 using Application_Form.Domain.Common;
+using Application_Form.Domain.Constant;
+using Application_Form.Infrastructure.Repositories;
 using AutoMapper;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Application_Form.Application.Feature.ApplicatioForm.Query.GetApplicationsPaged
 {
-    public class GetApplicationsPagedHandler : IRequestHandler<GetApplicationsPagedQuery, Result<PaginatedList<ApplicationFormResponseDto>>>
+    public class GetApplicationsPagedHandler : IRequestHandler<GetApplicationsPagedQuery, Result<PaginatedList<ApplicationFormListResponseDto>>>
     {
         private readonly IApplicationFormRepository _repository;
         private readonly IMapper _mapper;
@@ -21,7 +24,7 @@ namespace Application_Form.Application.Feature.ApplicatioForm.Query.GetApplicati
             _logger = logger;
         }
 
-        public async Task<Result<PaginatedList<ApplicationFormResponseDto>>> Handle(GetApplicationsPagedQuery request, CancellationToken cancellationToken)
+        public async Task<Result<PaginatedList<ApplicationFormListResponseDto>>> Handle(GetApplicationsPagedQuery request, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Retrieving paged applications: page {Page}, pageSize {PageSize}, status {Status}", request.Page, request.PageSize, request.Status);
             try
@@ -33,21 +36,33 @@ namespace Application_Form.Application.Feature.ApplicatioForm.Query.GetApplicati
                     request.SortOrder,
                     request.Status);
 
-                var dtoList = new PaginatedList<ApplicationFormResponseDto>
+                foreach (var app in result.Items)
                 {
-                    Items = _mapper.Map<IEnumerable<ApplicationFormResponseDto>>(result.Items),
+                    if (app.ExpirationDate <= DateOnly.FromDateTime(DateTime.UtcNow) && app.IsActive == true)
+                    {
+                        app.IsActive = false;
+                        app.ApprovalStatus = Status.Expired.ToString();
+                        _repository.Update(app);
+                        _logger.LogInformation("Application {AppId} has expired. Updated status to Expired and set IsActive to false.", app.Id);
+                        await _repository.SaveChangesAsync();
+                    }
+                }
+
+                var dtoList = new PaginatedList<ApplicationFormListResponseDto>
+                {
+                    Items = _mapper.Map<IEnumerable<ApplicationFormListResponseDto>>(result.Items),
                     Page = result.Page,
                     PageSize = result.PageSize,
                     TotalCount = result.TotalCount
                 };
 
                 _logger.LogInformation("Returning {Count} applications (total {Total})", dtoList.Items.Count(), dtoList.TotalCount);
-                return Result<PaginatedList<ApplicationFormResponseDto>>.SuccessResult(dtoList);
+                return Result<PaginatedList<ApplicationFormListResponseDto>>.SuccessResult(dtoList);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving applications");
-                return Result<PaginatedList<ApplicationFormResponseDto>>.Failure($"Error retrieving applications: {ex.Message}");
+                return Result<PaginatedList<ApplicationFormListResponseDto>>.Failure($"Error retrieving applications: {ex.Message}");
             }
         }
     }

@@ -22,12 +22,12 @@ namespace Application_Form.Application.Feature.ApplicatioForm.Command.ChangeAppl
                 var allowedPattern = $"^({string.Join("|", allowedStatuses)})$";
 
                 RuleFor(x => x.Dto.NewStatus)
-                    .NotEmpty().WithMessage("NewStatus is required.")
+                    .NotEmpty().WithMessage("New Status is required.")
                     .Matches(allowedPattern).WithMessage($"NewStatus must be one of: {string.Join(", ", allowedStatuses)}.");
 
                 RuleFor(x => x.Dto.ExpirationDate)
-                    .Must(date => date == null || date.Value >= DateOnly.FromDateTime(DateTime.UtcNow))
-                    .WithMessage("ExpirationDate must be a valid date (today or future).")
+                    .Must(date => date == null || date.Value > DateOnly.FromDateTime(DateTime.UtcNow))
+                    .WithMessage("Expiration date must be in the future.")
                     .When(x => x.Dto.ExpirationDate.HasValue);
             });
         }

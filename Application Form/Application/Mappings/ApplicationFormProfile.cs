@@ -25,6 +25,12 @@ namespace Application_Form.Application.Mappings
                 .ForMember(dest => dest.LastModified, opt => opt.MapFrom(src => src.LastModified.HasValue ? src.LastModified.Value : src.CreatedAt))
                 .ForMember(dest => dest.ExpirationDate, opt => opt.MapFrom(src => src.ExpirationDate.HasValue ? src.ExpirationDate.Value : default));
 
+            // List response mapping (Entity → List DTO) used for paginated list views
+            CreateMap<ApplicationForm, ApplicationFormListResponseDto>()
+                .ForMember(dest => dest.ClientName, opt => opt.MapFrom(src => src.Client != null ? src.Client.Name : string.Empty))
+                .ForMember(dest => dest.LastModified, opt => opt.MapFrom(src => src.LastModified.HasValue ? src.LastModified.Value : src.CreatedAt))
+                .ForMember(dest => dest.ExpirationDate, opt => opt.MapFrom(src => src.ExpirationDate.HasValue ? src.ExpirationDate.Value : default));
+
             // Update mapping from UpdateApplicationFormDto -> ApplicationForm (used for PATCH/PUT)
             CreateMap<UpdateApplicationFormDto, ApplicationForm>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())

@@ -1,22 +1,25 @@
-﻿using MediatR;
-using Microsoft.AspNetCore.Mvc;
-using Application_Form.Application.DTOs;
-using Application_Form.Application.Feature.ApplicatioForm.Command.CreateApplicationForm;
-using Application_Form.Domain.Common;
-using Application_Form.Application.Feature.ApplicatioForm.Command.UpdateApplicationForm;
+﻿using Application_Form.Application.DTOs;
 using Application_Form.Application.Feature.ApplicatioForm.Command.ChangeApplicationStatus;
+using Application_Form.Application.Feature.ApplicatioForm.Command.CreateApplicationForm;
+using Application_Form.Application.Feature.ApplicatioForm.Command.DeleteApplication;
 using Application_Form.Application.Feature.ApplicatioForm.Command.RenewApplicationCredentials;
 using Application_Form.Application.Feature.ApplicatioForm.Command.RenewApplicationExpirationDate;
-using Application_Form.Application.Feature.ApplicatioForm.Command.DeleteApplication;
-using Application_Form.Application.Feature.ApplicatioForm.Command.BulkDeleteApplications;
+using Application_Form.Application.Feature.ApplicatioForm.Command.UpdateApplicationForm;
 using Application_Form.Application.Feature.ApplicatioForm.Query.GetApplicationById;
 using Application_Form.Application.Feature.ApplicatioForm.Query.GetApplicationsPaged;
 using Application_Form.Application.Feature.ApplicatioForm.Query.GetApplicationsPagedByClientId;
+using Application_Form.Application.Models;
+using Application_Form.Domain.Common;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Filters;
+using Application_Form.SwaggerDocs;
 
 namespace Application_Form.Controllers
 {
     [Route("api/")]
     [ApiController]
+    [Produces("application/json")]
     public class ApplicationFormController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -32,10 +35,14 @@ namespace Application_Form.Controllers
         /// </summary>
         /// <param name="id">The application id (GUID).</param>
         /// <returns>Returns a Result object containing the application data.</returns>
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        /// <response code="200">Application found and returned successfully. Response contains the application data.</response>
+        /// <response code="404">Application not found for the provided id.</response>
+        [ProducesResponseType(typeof(Result<ApplicationFormResponseDto>), StatusCodes.Status200OK)]
+        //===========================================
+        [ProducesResponseType(typeof(Result<CustomEmptyResult>), StatusCodes.Status404NotFound)]
+        [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(BadRequestExample))]
         [HttpGet("application/{id:Guid}")]
-        public async Task<IActionResult> GetApplicationFormById(Guid id)
+        public async Task<ActionResult<Result<ApplicationFormResponseDto>>> GetApplicationFormById(Guid id)
         {
             var result = await _mediator.Send(new GetApplicationByIdQuery(id));
 
@@ -51,15 +58,20 @@ namespace Application_Form.Controllers
         /// <param name="clientId">Client identifier (GUID).</param>
         /// <param name="page">Page number (default 1).</param>
         /// <param name="pageSize">Page size (default 10).</param>
-        /// <param name="sortBy">Field to sort by (default CreatedAt) allowed => [CreatedAt, UpdatedAt, ApplicationName, Status, ExpirationDate].</param>
+        /// <param name="sortBy">Field to sort by (default CreatedAt) allowed =&gt; [CreatedAt, LastModified, ApplicationName, ApprovalStatus, ExpirationDate].</param>
         /// <param name="sortOrder">Sort order: asc or desc.</param>
-        /// <param name="status">Filter by approval status allowed => [Approved, Revoked, Rejected, Pending, All].</param>
+        /// <param name="status">Filter by approval status allowed =&gt; [Approved, Revoked, Rejected, Pending, Expired, All].</param>
         /// <returns>Returns a paginated list of application response DTOs.</returns>
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        /// <response code="200">Paged applications returned successfully.</response>
+        /// <response code="400">Invalid query parameters were provided.</response>
+        [ProducesResponseType(typeof(Result<PaginatedList<ApplicationFormListResponseDto>>), StatusCodes.Status200OK)]
+        //===========================================
+        //[ProducesResponseType(typeof(Result<PaginatedList<CustomEmptyResult>>), StatusCodes.Status404NotFound)]
+        //===========================================
+        [ProducesResponseType(typeof(Result<CustomEmptyResult>), StatusCodes.Status400BadRequest)]
+        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestExample))]
         [HttpGet("applications/{clientId:Guid}")]
-        public async Task<IActionResult> GetApplicationsByClientId(Guid clientId, [FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string sortBy = "CreatedAt", [FromQuery] string sortOrder = "desc", [FromQuery] string status = "All")
+        public async Task<ActionResult<Result<PaginatedList<ApplicationFormListResponseDto>>>> GetApplicationsByClientId(Guid clientId, [FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string sortBy = "CreatedAt", [FromQuery] string sortOrder = "desc", [FromQuery] string status = "All")
         {
             var query = new GetApplicationsPagedByClientIdQuery
             {
@@ -76,8 +88,8 @@ namespace Application_Form.Controllers
             if (!result.Success)
                 return BadRequest(result);
 
-            if (result.Data == null || !result.Data.Items.Any())
-                return NotFound(result);
+            //if (result.Data.TotalCount == 0)
+            //    return NotFound(result);
 
             return Ok(result);
         }
@@ -87,15 +99,20 @@ namespace Application_Form.Controllers
         /// </summary>
         /// <param name="page">Page number (default 1).</param>
         /// <param name="pageSize">Page size (default 10).</param>
-        /// <param name="sortBy">Field to sort by (default CreatedAt) allowed => [CreatedAt, UpdatedAt, ApplicationName, Status, Country, ExpirationDate].</param>
+        /// <param name="sortBy">Field to sort by (default CreatedAt) allowed =&gt; [CreatedAt, LastModified, ApplicationName, ApprovalStatus, ExpirationDate].</param>
         /// <param name="sortOrder">Sort order: asc or desc.</param>
-        /// <param name="status">Filter by approval status allowed => [Approved, Revoked, Rejected, Pending, All].</param>
+        /// <param name="status">Filter by approval status allowed =&gt; [Approved, Revoked, Rejected, Pending, Expired, All].</param>
         /// <returns>Returns a paginated list of application response DTOs.</returns>
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        /// <response code="200">Paged applications returned successfully.</response>
+        /// <response code="400">Invalid query parameters were provided.</response>
+        [ProducesResponseType(typeof(Result<PaginatedList<ApplicationFormListResponseDto>>), StatusCodes.Status200OK)]
+        //===========================================
+        //[ProducesResponseType(typeof(Result<PaginatedList<CustomEmptyResult>>), StatusCodes.Status404NotFound)]
+        //===========================================
+        [ProducesResponseType(typeof(Result<CustomEmptyResult>), StatusCodes.Status400BadRequest)]
+        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestExample))]
         [HttpGet("applications")]
-        public async Task<IActionResult> GetApplications([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string sortBy = "CreatedAt", [FromQuery] string sortOrder = "desc", [FromQuery] string status = "All")
+        public async Task<ActionResult<Result<PaginatedList<ApplicationFormListResponseDto>>>> GetApplications([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string sortBy = "CreatedAt", [FromQuery] string sortOrder = "desc", [FromQuery] string status = "All")
         {
             var query = new GetApplicationsPagedQuery
             {
@@ -111,8 +128,8 @@ namespace Application_Form.Controllers
             if (!result.Success)
                 return BadRequest(result);
 
-            if (result.Data == null || !result.Data.Items.Any())
-                return NotFound(result);
+            //if (result.Data.TotalCount == 0)
+            //    return NotFound(result);
 
             return Ok(result);
         }
@@ -122,11 +139,16 @@ namespace Application_Form.Controllers
         /// </summary>
         /// <param name="id">The application id (GUID).</param>
         /// <param name="dto">Update DTO containing editable fields.</param>
-        /// <returns>Returns 204 No Content on success.</returns>
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        /// <returns>Returns 200 Ok on success.</returns>
+        /// <response code="200">Application updated successfully. No content is returned.</response>
+        /// <response code="400">Invalid update request or validation failed.</response>
+        [ProducesResponseType(typeof(Result<ApplicationFormListResponseDto>), StatusCodes.Status200OK)]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(OkRequestExample))]
+        //===========================================
+        [ProducesResponseType(typeof(Result<CustomEmptyResult>), StatusCodes.Status400BadRequest)]
+        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestExample))]
         [HttpPut("application/{id:Guid}")]
-        public async Task<IActionResult> UpdateApplicationForm(Guid id, [FromBody] UpdateApplicationFormDto dto)
+        public async Task<ActionResult<Result<ApplicationFormListResponseDto>>> UpdateApplicationForm(Guid id, [FromBody] UpdateApplicationFormDto dto)
         {
             var command = new UpdateApplicationFormCommand(id, dto);
             var result = await _mediator.Send(command);
@@ -134,8 +156,7 @@ namespace Application_Form.Controllers
             if (!result.Success)
                 return BadRequest(result);
 
-            // Return 204 No Content on successful update
-            return NoContent();
+            return Ok(result);
         }
 
         /// <summary>
@@ -143,10 +164,16 @@ namespace Application_Form.Controllers
         /// </summary>
         /// <param name="dto">Create DTO containing application details.</param>
         /// <returns>Returns 201 Created with a Result object.</returns>
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        /// <response code="201">Application created successfully. Returns the created resource information.</response>
+        /// <response code="400">Invalid create request or validation failed.</response>
+        [ProducesResponseType(typeof(Result<CustomEmptyResult>), StatusCodes.Status201Created)]
+        [SwaggerResponseExample(StatusCodes.Status201Created, typeof(OkRequestExample))]
+        //===========================================
+        [ProducesResponseType(typeof(Result<CustomEmptyResult>), StatusCodes.Status400BadRequest)]
+        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestExample))]
+
         [HttpPost("application")]
-        public async Task<IActionResult> CreateApplicationForm([FromBody] CreateApplicationFormDto dto)
+        public async Task<ActionResult< Result<ApplicationFormListResponseDto>>> CreateApplicationForm([FromBody] CreateApplicationFormDto dto)
         {
             var command = new CreateApplicationFormCommand(dto);
             var result = await _mediator.Send(command);
@@ -154,18 +181,23 @@ namespace Application_Form.Controllers
             if (!result.Success)
                 return BadRequest(result);
 
-            return CreatedAtAction(nameof(GetApplicationFormById), null, result);
+            return StatusCode(201, result);
         }
 
         /// <summary>
-        /// Change the approval status of an application (approve, reject, revoke).
+        /// Change the approval status of an application ( Approved, Rejected, Revoked).
         /// </summary>
         /// <param name="id">Application id (GUID).</param>
         /// <param name="dto">Change status DTO (NewStatus, AdminNotes, ExpirationDate).</param>
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        /// <response code="200">Status changed successfully. Returns updated application information.</response>
+        /// <response code="400">Invalid status change request or validation failed.</response>
+        [ProducesResponseType(typeof(Result<CustomEmptyResult>), StatusCodes.Status200OK)]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(OkRequestExample))]
+        //===========================================
+        [ProducesResponseType(typeof(Result<CustomEmptyResult>), StatusCodes.Status400BadRequest)]
+        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestExample))]
         [HttpPatch("application/{id:Guid}/status")]
-        public async Task<IActionResult> ChangeApplicationStatus(Guid id, [FromBody] ChangeApplicationStatusDto dto)
+        public async Task<ActionResult<Result<ApplicationFormListResponseDto>>> ChangeApplicationStatus(Guid id, [FromBody] ChangeApplicationStatusDto dto)
         {
             var command = new ChangeApplicationStatusCommand(id, dto);
             var result = await _mediator.Send(command);
@@ -180,10 +212,15 @@ namespace Application_Form.Controllers
         /// Renew API credentials for an application.
         /// </summary>
         /// <param name="id">Application id (GUID)</param>
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [HttpPatch("application/{id:Guid}/renew")]
-        public async Task<IActionResult> RenewApplicationCredentials(Guid id)
+        /// <response code="200">Credentials renewed successfully. Returns new credentials/info.</response>
+        /// <response code="400">Failed to renew credentials due to validation or business rules.</response>
+        [ProducesResponseType(typeof(Result<CustomEmptyResult>), StatusCodes.Status200OK)]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(OkRequestExample))]
+        //===========================================
+        [ProducesResponseType(typeof(Result<CustomEmptyResult>), StatusCodes.Status400BadRequest)]
+        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestExample))]
+        [HttpPatch("application/{id:Guid}/renew-credentials")]
+        public async Task<ActionResult<Result<ApplicationFormListResponseDto>>> RenewApplicationCredentials(Guid id)
         {
             var command = new RenewApplicationCredentialsCommand(id);
             var result = await _mediator.Send(command);
@@ -199,33 +236,16 @@ namespace Application_Form.Controllers
         /// </summary>
         /// <param name="id">Application id (GUID)</param>
         /// <param name="dto">DTO containing the new expiration date.</param>
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        /// <response code="200">Expiration date updated successfully.</response>
+        /// <response code="400">Invalid expiration date or request failed validation.</response>
+        [ProducesResponseType(typeof(Result<CustomEmptyResult>), StatusCodes.Status200OK)]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(OkRequestExample))]
+        //===========================================
+        [ProducesResponseType(typeof(Result<CustomEmptyResult>), StatusCodes.Status400BadRequest)]
+        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestExample))]
         [HttpPatch("application/{id:Guid}/renew-expiration")]
-        public async Task<IActionResult> RenewApplicationExpirationDate(Guid id, [FromBody] RenewApplicationExpirationDateDto dto)
+        public async Task<ActionResult<Result<ApplicationFormListResponseDto>>> RenewApplicationExpirationDate(Guid id, [FromBody] RenewApplicationExpirationDateDto dto)
         {
-            var command = new RenewApplicationExpirationDateCommand(id, dto.NewExpirationDate);
-            var result = await _mediator.Send(command);
-
-            if (!result.Success)
-                return BadRequest(result);
-
-            return Ok(result);
-        }
-
-        /// <summary>
-        /// Renew or update the expiration date for an application.
-        /// </summary>
-        /// <param name="id">Application id (GUID)</param>
-        /// <param name="dto">DTO containing new expiration date</param>
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [HttpPatch("application/{id:Guid}/expiration")]
-        public async Task<IActionResult> RenewApplicationExpiration(Guid id, [FromBody] Application_Form.Application.DTOs.RenewApplicationExpirationDateDto dto)
-        {
-            if (dto == null)
-                return BadRequest(Result.Failure("Request body is required."));
-
             var command = new RenewApplicationExpirationDateCommand(id, dto.NewExpirationDate);
             var result = await _mediator.Send(command);
 
@@ -238,29 +258,17 @@ namespace Application_Form.Controllers
         /// <summary>
         /// Soft delete an application (mark IsDeleted=true and IsActive=false).
         /// </summary>
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        /// <response code="200">Application soft-deleted successfully.</response>
+        /// <response code="400">Failed to delete the application due to validation or business rules.</response>
+        [ProducesResponseType(typeof(Result<CustomEmptyResult>), StatusCodes.Status200OK)]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(OkRequestExample))]
+        //===========================================
+        [ProducesResponseType(typeof(Result<CustomEmptyResult>), StatusCodes.Status400BadRequest)]
+        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestExample))]
         [HttpDelete("application/{id:Guid}")]
-        public async Task<IActionResult> DeleteApplication(Guid id)
+        public async Task<ActionResult<Result<object>>> DeleteApplication(Guid id)
         {
             var command = new DeleteApplicationCommand(id);
-            var result = await _mediator.Send(command);
-
-            if (!result.Success)
-                return BadRequest(result);
-
-            return Ok(result);
-        }
-
-        /// <summary>
-        /// Bulk soft delete applications (mark IsDeleted=true and IsActive=false) by ids.
-        /// </summary>
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [HttpDelete("applications/bulk-delete")]
-        public async Task<IActionResult> BulkDeleteApplications([FromBody] IEnumerable<Guid> ids)
-        {
-            var command = new BulkDeleteApplicationsCommand(ids);
             var result = await _mediator.Send(command);
 
             if (!result.Success)

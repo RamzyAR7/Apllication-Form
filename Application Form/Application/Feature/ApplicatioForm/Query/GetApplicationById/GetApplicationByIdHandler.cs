@@ -1,6 +1,7 @@
 ﻿using Application_Form.Application.DTOs;
 using Application_Form.Application.Interfaces.Repositories;
 using Application_Form.Domain.Common;
+using Application_Form.Domain.Constant;
 using AutoMapper;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -30,6 +31,14 @@ namespace Application_Form.Application.Feature.ApplicatioForm.Query.GetApplicati
                 {
                     _logger.LogWarning("Application {AppId} not found", request.Id);
                     return Result<ApplicationFormResponseDto>.Failure("Application not found.");
+                }
+                if (application.ExpirationDate <= DateOnly.FromDateTime(DateTime.UtcNow) && application.IsActive == true)
+                {
+                    application.IsActive = false;
+                    application.ApprovalStatus = Status.Expired.ToString();
+                    _applicationFormRepository.Update(application);
+                    _logger.LogInformation("Application {AppId} has expired. Updated status to Expired and set IsActive to false.", request.Id);
+                    await _applicationFormRepository.SaveChangesAsync();
                 }
 
                 var dto = _mapper.Map<ApplicationFormResponseDto>(application);

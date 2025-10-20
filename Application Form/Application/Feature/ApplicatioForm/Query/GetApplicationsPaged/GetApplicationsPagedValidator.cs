@@ -15,12 +15,12 @@ namespace Application_Form.Application.Feature.ApplicatioForm.Query.GetApplicati
                 .WithMessage("SortOrder must be either 'asc' or 'desc'.");
 
             RuleFor(x => x.Status)
-                .Must(s => new[] { nameof(Status.Approved), nameof(Status.Revoked), nameof(Status.Pending), nameof(Status.Rejected), "All" }
+                .Must(s => new[] { nameof(Status.Approved), nameof(Status.Revoked), nameof(Status.Pending), nameof(Status.Rejected), nameof(Status.Expired), "All" }
                 .Contains(s, StringComparer.OrdinalIgnoreCase))
                 .WithMessage("Invalid status filter.");
 
             RuleFor(x => x.SortBy)
-                .Must(sb => new[] { "CreatedAt", "UpdatedAt", "ApplicationName", "Status", "Country", "ExpirationDate"}
+                .Must(sb => new[] { "CreatedAt", "LastModified", "ApplicationName", "ApprovalStatus", "ExpirationDate"}
                 .Contains(sb, StringComparer.OrdinalIgnoreCase))
                 .WithMessage("Invalid SortBy field.");
         }

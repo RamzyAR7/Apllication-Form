@@ -1,14 +1,18 @@
+using Application_Form.Application.Behaviors;
+using Application_Form.Application.Interfaces.Repositories;
+using Application_Form.Application.Services;
 using Application_Form.Domain.Entities;
 using Application_Form.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
+using Application_Form.Infrastructure.Repositories;
 using AutoMapper;
 using FluentValidation;
 using MediatR;
-using Application_Form.Application.Interfaces.Repositories;
-using Application_Form.Infrastructure.Repositories;
-using Application_Form.Application.Behaviors;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using Application_Form.Application.Services;
+using Swashbuckle.AspNetCore.Filters;
+using Application_Form.SwaggerDocs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,23 +24,34 @@ builder.Services.AddControllers();
 builder.Services.AddAutoMapper(typeof(ApplicationForm).Assembly);
 
 // Register FluentValidation validators from the application's assembly
-builder.Services.AddValidatorsFromAssemblyContaining<ApplicationForm>();
+builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 
 // Register MediatR handlers from the application's assembly
 builder.Services.AddMediatR(typeof(ApplicationForm).Assembly);
 
-// Register validation behaviors for Result<T> and Result (non-generic) requests
-builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviorForResult<,>));
-builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviorForSimpleResult<,>));
+// Register validation behaviors for Result<T>
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IApplicationFormRepository, ApplicationFormRepository>();
+builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IApiCredentialService, ApiCredentialService>();
+
+// Disable the model-binding / ModelState validation
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.SuppressModelStateInvalidFilter = true;
+});
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+// Configure Swagger and examples
+builder.Services.AddSwaggerGen(c => c.ExampleFilters());
+// Register example providers from this assembly
+builder.Services.AddSwaggerExamplesFromAssemblyOf<OkRequestExample>();
+builder.Services.AddSwaggerExamplesFromAssemblyOf<BadRequestExample>();
 // Include XML comments (generated via <GenerateDocumentationFile>true</GenerateDocumentationFile> in csproj)
 var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);

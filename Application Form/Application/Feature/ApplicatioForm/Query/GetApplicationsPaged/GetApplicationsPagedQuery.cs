@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Application_Form.Application.Feature.ApplicatioForm.Query.GetApplicationsPaged
 {
-    public class GetApplicationsPagedQuery: IRequest<Result<PaginatedList<ApplicationFormResponseDto>>>
+    public class GetApplicationsPagedQuery: IRequest<Result<PaginatedList<ApplicationFormListResponseDto>>>
     {
         public int Page { get; set; } = 1;
         public int PageSize { get; set; } = 10;

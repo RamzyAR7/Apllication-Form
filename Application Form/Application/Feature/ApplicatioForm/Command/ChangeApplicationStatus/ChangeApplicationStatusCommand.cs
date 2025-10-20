@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Application_Form.Application.Feature.ApplicatioForm.Command.ChangeApplicationStatus
 {
-    public class ChangeApplicationStatusCommand: IRequest<Result>
+    public class ChangeApplicationStatusCommand: IRequest<Result<ApplicationFormListResponseDto>>
     {
         public Guid Id { get; set; }
         public ChangeApplicationStatusDto Dto { get; set; }

@@ -6,10 +6,11 @@ using Microsoft.Extensions.Logging;
 using System.Threading;
 using System.Threading.Tasks;
 using System;
+using Application_Form.Application.DTOs;
 
 namespace Application_Form.Application.Feature.ApplicatioForm.Command.RenewApplicationExpirationDate
 {
-    public class RenewApplicationExpirationDateHandler : IRequestHandler<RenewApplicationExpirationDateCommand, Result>
+    public class RenewApplicationExpirationDateHandler : IRequestHandler<RenewApplicationExpirationDateCommand, Result<ApplicationFormListResponseDto>>
     {
         private readonly IApplicationFormRepository _applicationRepository;
         private readonly ILogger<RenewApplicationExpirationDateHandler> _logger;
@@ -20,21 +21,21 @@ namespace Application_Form.Application.Feature.ApplicatioForm.Command.RenewAppli
             _logger = logger;
         }
 
-        public async Task<Result> Handle(RenewApplicationExpirationDateCommand request, CancellationToken cancellationToken)
+        public async Task<Result<ApplicationFormListResponseDto>> Handle(RenewApplicationExpirationDateCommand request, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Starting renewal process for ApplicationId: {AppId}", request.ApplicationId);
 
             var entity = await _applicationRepository.GetByIdAsync(request.ApplicationId);
-            if (entity == null || entity.IsDeleted)
+            if (entity == null)
             {
                 _logger.LogWarning("Application not found. Id: {AppId}", request.ApplicationId);
-                return Result.Failure("Application not found.");
+                return Result<ApplicationFormListResponseDto>.Failure("Application not found.");
             }
 
-            if (entity.ApprovalStatus != Status.Approved.ToString() || !entity.IsActive)
+            if (entity.ApprovalStatus != Status.Approved.ToString() && entity.ApprovalStatus != Status.Expired.ToString())
             {
                 _logger.LogWarning("Renewal denied for ApplicationId: {AppId} (Status: {Status})", request.ApplicationId, entity.ApprovalStatus);
-                return Result.Failure("Only approved applications can be renewed.");
+                return Result<ApplicationFormListResponseDto>.Failure("Only approved or Expired applications can be renewed.");
             }
 
             var newDate = request.NewExpirationDate;
@@ -43,7 +44,7 @@ namespace Application_Form.Application.Feature.ApplicatioForm.Command.RenewAppli
             if (newDate <= now)
             {
                 _logger.LogWarning("Invalid expiration date provided for ApplicationId: {AppId}", request.ApplicationId);
-                return Result.Failure("Expiration date must be a future date.");
+                return Result<ApplicationFormListResponseDto>.Failure("Expiration date must be a future date.");
             }
 
             var oldDate = entity.ExpirationDate;
@@ -56,6 +57,7 @@ namespace Application_Form.Application.Feature.ApplicatioForm.Command.RenewAppli
             {
                 _logger.LogInformation("ApplicationId: {AppId} expired on {OldDate} — renewing to {NewDate}", request.ApplicationId, oldDate, newDate);
                 entity.IsActive = true;
+                entity.ApprovalStatus = Status.Approved.ToString();
             }
             else
             {
@@ -70,7 +72,7 @@ namespace Application_Form.Application.Feature.ApplicatioForm.Command.RenewAppli
 
             _logger.LogInformation("ApplicationId: {AppId} renewed successfully until {Date}.", request.ApplicationId, entity.ExpirationDate);
 
-            return Result.SuccessResult($"Application renewed successfully until {entity.ExpirationDate}");
+            return Result<ApplicationFormListResponseDto>.SuccessResult(null);
         }
     }
 }

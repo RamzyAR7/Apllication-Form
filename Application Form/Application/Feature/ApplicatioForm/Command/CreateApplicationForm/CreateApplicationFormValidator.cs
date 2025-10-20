@@ -1,5 +1,9 @@
 ﻿using System;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
+using System.Net;
+using System.Net.Mail;
 using Application_Form.Domain.Constant;
 using FluentValidation;
 
@@ -11,7 +15,7 @@ namespace Application_Form.Application.Feature.ApplicatioForm.Command.CreateAppl
         {
             RuleFor(x => x.Dto.ApplicationName)
                 .NotEmpty().WithMessage("ApplicationName is required.")
-                .MaximumLength(200).WithMessage("ApplicationName must be at most 200 characters.");
+                .MaximumLength(100).WithMessage("ApplicationName must be at most 100 characters.");
 
             RuleFor(x => x.Dto.ApplicationDescription)
                 .NotEmpty().WithMessage("ApplicationDescription is required.")
@@ -20,10 +24,24 @@ namespace Application_Form.Application.Feature.ApplicatioForm.Command.CreateAppl
             RuleFor(x => x.Dto.EmailAddress)
                 .NotEmpty().WithMessage("EmailAddress is required.")
                 .EmailAddress().WithMessage("EmailAddress must be a valid email address.")
-                .MaximumLength(255).WithMessage("EmailAddress must be at most 255 characters.");
+                .MaximumLength(255).WithMessage("EmailAddress must be at most 255 characters.")
+                .MustAsync(async (command, email, ct) =>
+                {
+                    try
+                    {
+                        var host = new MailAddress(email).Host;
+                        await Dns.GetHostEntryAsync(host);
+                        return true;
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                }).WithMessage("Email domain does not exist.");
 
             RuleFor(x => x.Dto.ApplicationType)
-                .NotEmpty().WithMessage("ApplicationType is required.");
+                .NotEmpty().WithMessage("ApplicationType is required.")
+                .MaximumLength(50).WithMessage("ApplicationType must be at most 50 characters.");
 
             RuleFor(x => x.Dto.RedirectUri)
                 .MaximumLength(500).WithMessage("RedirectUri must be at most 500 characters.")
@@ -36,6 +54,7 @@ namespace Application_Form.Application.Feature.ApplicatioForm.Command.CreateAppl
 
             RuleFor(x => x.Dto.Environment)
                 .NotEmpty().WithMessage("Environment is required.")
+                .MaximumLength(50).WithMessage("Environment must be at most 50 characters.")
                 .Must(env => Enum.GetNames(typeof(ApiEnvironment)).Contains(env))
                 .WithMessage("Invalid environment. Must be Sandbox, Production, or Both.");
 
@@ -48,6 +67,7 @@ namespace Application_Form.Application.Feature.ApplicatioForm.Command.CreateAppl
 
             RuleFor(x => x.Dto.PrivacyPolicyUrl)
                 .Cascade(CascadeMode.Stop)
+                .MaximumLength(300).WithMessage("PrivacyPolicyUrl must be at most 300 characters.")
                 .Must(uri => Uri.IsWellFormedUriString(uri, UriKind.Absolute)).WithMessage("PrivacyPolicyUrl must be a valid URL.")
                 .When(x => !string.IsNullOrWhiteSpace(x.Dto.PrivacyPolicyUrl));
 
@@ -58,7 +78,29 @@ namespace Application_Form.Application.Feature.ApplicatioForm.Command.CreateAppl
             RuleFor(x => x.Dto.TechnicalContactEmail)
                 .EmailAddress().WithMessage("TechnicalContactEmail must be a valid email address.")
                 .MaximumLength(150).WithMessage("TechnicalContactEmail must be at most 150 characters.")
-                .When(x => !string.IsNullOrWhiteSpace(x.Dto.TechnicalContactEmail));
+                .When(x => !string.IsNullOrWhiteSpace(x.Dto.TechnicalContactEmail))
+                .MustAsync(async (command, email, ct) =>
+                {
+                    if (string.IsNullOrWhiteSpace(email)) return true;
+                    try
+                    {
+                        var host = new MailAddress(email).Host;
+                        await Dns.GetHostEntryAsync(host);
+                        return true;
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                }).WithMessage("Technical contact email domain does not exist.");
+
+            RuleFor(x => x.Dto.OrganizationName)
+                .MaximumLength(150).WithMessage("OrganizationName must be at most 150 characters.")
+                .When(x => !string.IsNullOrWhiteSpace(x.Dto.OrganizationName));
+
+            RuleFor(x => x.Dto.DataRetentionDescription)
+                .MaximumLength(500).WithMessage("DataRetentionDescription must be at most 500 characters.")
+                .When(x => !string.IsNullOrWhiteSpace(x.Dto.DataRetentionDescription));
 
             RuleFor(x => x.Dto.ClientId)
                 .NotEmpty().WithMessage("ClientId is required.");

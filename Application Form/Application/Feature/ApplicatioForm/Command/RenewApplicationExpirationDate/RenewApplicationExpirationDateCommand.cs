@@ -1,9 +1,10 @@
-﻿using Application_Form.Domain.Common;
+﻿using Application_Form.Application.DTOs;
+using Application_Form.Domain.Common;
 using MediatR;
 
 namespace Application_Form.Application.Feature.ApplicatioForm.Command.RenewApplicationExpirationDate
 {
-    public class RenewApplicationExpirationDateCommand: IRequest<Result>
+    public class RenewApplicationExpirationDateCommand: IRequest<Result<ApplicationFormListResponseDto>>
     {
         public Guid ApplicationId { get; set; }
         public DateOnly NewExpirationDate { get; set; }
