@@ -66,8 +66,6 @@ namespace Application_Form.Controllers
         /// <response code="400">Invalid query parameters were provided.</response>
         [ProducesResponseType(typeof(Result<PaginatedList<ApplicationFormListResponseDto>>), StatusCodes.Status200OK)]
         //===========================================
-        //[ProducesResponseType(typeof(Result<PaginatedList<CustomEmptyResult>>), StatusCodes.Status404NotFound)]
-        //===========================================
         [ProducesResponseType(typeof(Result<CustomEmptyResult>), StatusCodes.Status400BadRequest)]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestExample))]
         [HttpGet("applications/{clientId:Guid}")]
@@ -88,9 +86,6 @@ namespace Application_Form.Controllers
             if (!result.Success)
                 return BadRequest(result);
 
-            //if (result.Data.TotalCount == 0)
-            //    return NotFound(result);
-
             return Ok(result);
         }
 
@@ -106,8 +101,6 @@ namespace Application_Form.Controllers
         /// <response code="200">Paged applications returned successfully.</response>
         /// <response code="400">Invalid query parameters were provided.</response>
         [ProducesResponseType(typeof(Result<PaginatedList<ApplicationFormListResponseDto>>), StatusCodes.Status200OK)]
-        //===========================================
-        //[ProducesResponseType(typeof(Result<PaginatedList<CustomEmptyResult>>), StatusCodes.Status404NotFound)]
         //===========================================
         [ProducesResponseType(typeof(Result<CustomEmptyResult>), StatusCodes.Status400BadRequest)]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestExample))]
@@ -127,9 +120,6 @@ namespace Application_Form.Controllers
 
             if (!result.Success)
                 return BadRequest(result);
-
-            //if (result.Data.TotalCount == 0)
-            //    return NotFound(result);
 
             return Ok(result);
         }

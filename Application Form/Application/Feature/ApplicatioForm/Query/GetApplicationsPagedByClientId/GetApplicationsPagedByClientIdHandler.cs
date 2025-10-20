@@ -42,9 +42,8 @@ namespace Application_Form.Application.Feature.ApplicatioForm.Query.GetApplicati
                     request.PageSize,
                     request.SortBy,
                     request.SortOrder,
-                    request.Status);
-
-
+                    request.Status
+                );
 
                 foreach (var app in result.Items)
                 {
@@ -66,6 +65,12 @@ namespace Application_Form.Application.Feature.ApplicatioForm.Query.GetApplicati
                     TotalCount = result.TotalCount
                 };
 
+                if (!result.Items.Any())
+                {
+                    _logger.LogInformation("No applications found for client {ClientId}.", request.ClientId);
+
+                    return Result<PaginatedList<ApplicationFormListResponseDto>>.SuccessResult(dtoList, "No applications founds");
+                }
                 _logger.LogInformation("Returning {Count} applications for client {ClientId} (total {Total})", dtoList.Items.Count(), request.ClientId, dtoList.TotalCount);
                 return Result<PaginatedList<ApplicationFormListResponseDto>>.SuccessResult(dtoList);
             }

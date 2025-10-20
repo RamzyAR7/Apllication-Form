@@ -48,6 +48,8 @@ namespace Application_Form.Application.Feature.ApplicatioForm.Query.GetApplicati
                     }
                 }
 
+
+
                 var dtoList = new PaginatedList<ApplicationFormListResponseDto>
                 {
                     Items = _mapper.Map<IEnumerable<ApplicationFormListResponseDto>>(result.Items),
@@ -55,6 +57,12 @@ namespace Application_Form.Application.Feature.ApplicatioForm.Query.GetApplicati
                     PageSize = result.PageSize,
                     TotalCount = result.TotalCount
                 };
+
+                if (!result.Items.Any())
+                {
+                    _logger.LogInformation("No applications found.");
+                    return Result<PaginatedList<ApplicationFormListResponseDto>>.SuccessResult(dtoList, "No applications founds");
+                }
 
                 _logger.LogInformation("Returning {Count} applications (total {Total})", dtoList.Items.Count(), dtoList.TotalCount);
                 return Result<PaginatedList<ApplicationFormListResponseDto>>.SuccessResult(dtoList);
