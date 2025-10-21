@@ -21,11 +21,11 @@ namespace ApplicationForm.Test.Tests.Handlers
         public async Task ChangeStatus_WhenApplicationNotFound_ReturnsFailure()
         {
             var repoMock = new Mock<IApplicationFormRepository>();
-            repoMock.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((ApplicationFormEntity)null);
+            repoMock.Setup(r => r.GetByIdAsync(It.IsAny<long>())).ReturnsAsync((ApplicationFormEntity)null);
             var apiMock = new Mock<IApiCredentialService>();
             var logger = new NoopLogger<ChangeApplicationStatusHandler>();
             var handler = new ChangeApplicationStatusHandler(repoMock.Object, apiMock.Object, logger);
-            var cmd = new ChangeApplicationStatusCommand(Guid.NewGuid(), new ChangeApplicationStatusDto { NewStatus = Status.Approved.ToString() });
+            var cmd = new ChangeApplicationStatusCommand(1L, new ChangeApplicationStatusDto { NewStatus = Status.Approved.ToString() });
 
             var res = await handler.Handle(cmd, CancellationToken.None);
 
@@ -35,7 +35,7 @@ namespace ApplicationForm.Test.Tests.Handlers
         [Fact]
         public async Task ChangeStatus_Approve_Succeeds_WhenAllowed()
         {
-            var ent = new ApplicationFormEntity { Id = Guid.NewGuid(), ApprovalStatus = Status.Pending.ToString(), IsActive = false };
+            var ent = new ApplicationFormEntity { Id = 2L, ApprovalStatus = Status.Pending.ToString(), IsActive = false };
             var repoMock = new Mock<IApplicationFormRepository>();
             repoMock.Setup(r => r.GetByIdAsync(ent.Id)).ReturnsAsync(ent);
             repoMock.Setup(r => r.Update(It.IsAny<ApplicationFormEntity>()));
@@ -68,14 +68,14 @@ namespace ApplicationForm.Test.Tests.Handlers
         {
             var ent = new ApplicationFormEntity
             {
-                Id = Guid.NewGuid(),
+                Id = 3L,
                 ApplicationName = "S",
                 ApplicationDescription = "D",
                 EmailAddress = "s@s.com",
                 OrganizationName = "Org",
                 ApplicationType = "Web",
                 Environment = ApiEnvironment.Sandbox.ToString(),
-                ClientId = Guid.NewGuid(),
+                ClientId = 4L,
                 ApprovalStatus = from,
                 AcceptTerms = true
             };
@@ -97,7 +97,7 @@ namespace ApplicationForm.Test.Tests.Handlers
         [Fact]
         public async Task ChangeStatus_InvalidTransition_Fails()
         {
-            var ent = new ApplicationFormEntity { Id = Guid.NewGuid(), ApprovalStatus = Status.Rejected.ToString(), IsActive = false };
+            var ent = new ApplicationFormEntity { Id = 5L, ApprovalStatus = Status.Rejected.ToString(), IsActive = false };
             var repoMock = new Mock<IApplicationFormRepository>();
             repoMock.Setup(r => r.GetByIdAsync(ent.Id)).ReturnsAsync(ent);
             var apiMock = new Mock<IApiCredentialService>();

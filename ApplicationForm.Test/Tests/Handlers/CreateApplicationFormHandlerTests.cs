@@ -22,12 +22,12 @@ namespace ApplicationForm.Test.Tests.Handlers
         {
             var repoMock = new Mock<IApplicationFormRepository>();
             var clientRepoMock = new Mock<IClientRepository>();
-            clientRepoMock.Setup(c => c.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Client)null);
+            clientRepoMock.Setup(c => c.GetByIdAsync(It.IsAny<long>())).ReturnsAsync((Client)null);
             var mapperMock = new Mock<IMapper>();
             var logger = new NoopLogger<CreateApplicationFormHandler>();
             var handler = new CreateApplicationFormHandler(repoMock.Object, clientRepoMock.Object, mapperMock.Object, logger);
 
-            var dto = new CreateApplicationFormDto { ClientId = Guid.NewGuid(), ApplicationName = "Test" };
+            var dto = new CreateApplicationFormDto { ClientId = 1L, ApplicationName = "Test" };
             var res = await handler.Handle(new CreateApplicationFormCommand(dto), CancellationToken.None);
             Assert.False(res.Success);
         }
@@ -35,8 +35,8 @@ namespace ApplicationForm.Test.Tests.Handlers
         [Fact]
         public async Task Create_WhenApplicationNameExists_ReturnsFailure()
         {
-            var client = new Client { Id = Guid.NewGuid() };
-            var existingApp = new ApplicationFormEntity { Id = Guid.NewGuid(), ApplicationName = "Test", ClientId = client.Id };
+            var client = new Client { Id = 2L };
+            var existingApp = new ApplicationFormEntity { Id = 3L, ApplicationName = "Test", ClientId = client.Id };
             var repoMock = new Mock<IApplicationFormRepository>();
             repoMock.Setup(r => r.GetByNameAndClientIdAsync("Test", client.Id)).ReturnsAsync(existingApp);
             var clientRepoMock = new Mock<IClientRepository>();
@@ -53,7 +53,7 @@ namespace ApplicationForm.Test.Tests.Handlers
         [Fact]
         public async Task Create_Valid_Succeeds()
         {
-            var client = new Client { Id = Guid.NewGuid() };
+            var client = new Client { Id = 4L };
             var repoMock = new Mock<IApplicationFormRepository>();
             repoMock.Setup(r => r.GetByNameAndClientIdAsync(It.IsAny<string>(), client.Id)).ReturnsAsync((ApplicationFormEntity)null);
             repoMock.Setup(r => r.AddAsync(It.IsAny<ApplicationFormEntity>()));
@@ -89,7 +89,7 @@ namespace ApplicationForm.Test.Tests.Handlers
                 ApplicationType = "Web",
                 Environment = ApiEnvironment.Sandbox.ToString(),
                 AcceptTerms = accept,
-                ClientId = Guid.NewGuid()
+                ClientId = 5L
             };
             var v = new CreateApplicationFormValidator();
             var r = await v.ValidateAsync(new CreateApplicationFormCommand(dto));
@@ -112,7 +112,7 @@ namespace ApplicationForm.Test.Tests.Handlers
             var clientRepoMock = new Moq.Mock<IClientRepository>();
             var mapperMock = new Moq.Mock<AutoMapper.IMapper>();
             var logger = new NoopLogger<CreateApplicationFormHandler>();
-            var client = new Client { Id = Guid.NewGuid(), Name = "C" };
+            var client = new Client { Id = 6L, Name = "C" };
             clientRepoMock.Setup(c => c.GetByIdAsync(client.Id)).ReturnsAsync(client);
             repoMock.Setup(r => r.GetByNameAndClientIdAsync(name, client.Id)).ReturnsAsync((ApplicationFormEntity)null);
             repoMock.Setup(r => r.AddAsync(It.IsAny<ApplicationFormEntity>()));

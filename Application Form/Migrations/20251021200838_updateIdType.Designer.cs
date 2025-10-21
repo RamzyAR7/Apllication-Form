@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Application_Form.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251020085335_ApplicatonformEntity")]
-    partial class ApplicatonformEntity
+    [Migration("20251021200838_updateIdType")]
+    partial class updateIdType
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,9 +27,11 @@ namespace Application_Form.Migrations
 
             modelBuilder.Entity("Application_Form.Domain.Entities.ApplicationForm", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<bool>("AcceptTerms")
                         .HasColumnType("bit");
@@ -72,8 +74,8 @@ namespace Application_Form.Migrations
                         .HasColumnType("nvarchar(20)")
                         .HasDefaultValue("Pending");
 
-                    b.Property<Guid>("ClientId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<long>("ClientId")
+                        .HasColumnType("bigint");
 
                     b.Property<int?>("CountryId")
                         .HasColumnType("int");
@@ -139,9 +141,6 @@ namespace Application_Form.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ApplicationName")
-                        .IsUnique();
-
                     b.HasIndex("ApprovalStatus");
 
                     b.HasIndex("ClientId");
@@ -154,14 +153,20 @@ namespace Application_Form.Migrations
 
                     b.HasIndex("IsDeleted");
 
+                    b.HasIndex("ApplicationName", "ClientId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_ApplicationForm_Name_ClientId");
+
                     b.ToTable("ApplicationForms", (string)null);
                 });
 
             modelBuilder.Entity("Application_Form.Domain.Entities.Client", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()

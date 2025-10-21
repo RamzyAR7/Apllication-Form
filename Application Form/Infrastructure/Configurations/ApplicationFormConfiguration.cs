@@ -11,6 +11,9 @@ namespace Application_Form.Infrastructure.Configurations
         {
             builder.ToTable("ApplicationForms");
             builder.HasKey(af => af.Id);
+            builder.Property(af => af.Id)
+                .ValueGeneratedOnAdd()
+                .HasColumnType("bigint");
 
             #region Required Fields
             builder.Property(af => af.ApplicationName)
@@ -41,7 +44,8 @@ namespace Application_Form.Infrastructure.Configurations
                 .IsRequired();
 
             builder.Property(af => af.ClientId)
-                .IsRequired();
+                .IsRequired()
+                .HasColumnType("bigint");
 
             // Indexes  
             builder.HasIndex(af => af.ClientId);

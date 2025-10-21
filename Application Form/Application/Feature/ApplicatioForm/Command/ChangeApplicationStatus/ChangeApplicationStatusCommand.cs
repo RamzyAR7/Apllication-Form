@@ -6,9 +6,9 @@ namespace Application_Form.Application.Feature.ApplicatioForm.Command.ChangeAppl
 {
     public class ChangeApplicationStatusCommand: IRequest<Result<CustomEmptyResult>>
     {
-        public Guid Id { get; set; }
+        public long Id { get; set; }
         public ChangeApplicationStatusDto Dto { get; set; }
-        public ChangeApplicationStatusCommand(Guid id, ChangeApplicationStatusDto dto)
+        public ChangeApplicationStatusCommand(long id, ChangeApplicationStatusDto dto)
         {
             Id = id;
             Dto = dto;

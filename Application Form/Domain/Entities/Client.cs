@@ -1,9 +1,8 @@
-﻿
-namespace Application_Form.Domain.Entities
+﻿namespace Application_Form.Domain.Entities
 {
     public class Client
     {
-        public Guid Id { get; set; } = Guid.NewGuid();
+        public long Id { get; set; }
         public string Name { get; set; }
 
         // Navigation property

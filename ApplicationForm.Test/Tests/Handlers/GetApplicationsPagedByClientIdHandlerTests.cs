@@ -24,31 +24,31 @@ namespace ApplicationForm.Test.Tests.Handlers
         {
             var repoMock = new Mock<IApplicationFormRepository>();
             var clientRepoMock = new Mock<IClientRepository>();
-            clientRepoMock.Setup(c => c.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Client)null);
+            clientRepoMock.Setup(c => c.GetByIdAsync(It.IsAny<long>())).ReturnsAsync((Client)null);
             var mapperMock = new Mock<IMapper>();
             var logger = new NoopLogger<GetApplicationsPagedByClientIdHandler>();
             var handler = new GetApplicationsPagedByClientIdHandler(repoMock.Object, clientRepoMock.Object, mapperMock.Object, logger);
 
-            var res = await handler.Handle(new GetApplicationsPagedByClientIdQuery { ClientId = Guid.NewGuid() }, CancellationToken.None);
+            var res = await handler.Handle(new GetApplicationsPagedByClientIdQuery { ClientId = 1L }, CancellationToken.None);
             Assert.False(res.Success);
         }
 
         [Fact]
         public async Task GetPagedByClient_Succeeds()
         {
-            var pagedList = new PaginatedListEntity { Items = new[] { new ApplicationFormEntity { Id = Guid.NewGuid() } }, TotalCount = 1, Page = 1, PageSize = 10 };
+            var pagedList = new PaginatedListEntity { Items = new[] { new ApplicationFormEntity { Id = 2L } }, TotalCount = 1, Page = 1, PageSize = 10 };
             var repoMock = new Mock<IApplicationFormRepository>();
-            repoMock.Setup(r => r.GetPagedByClientIdAsync(It.IsAny<Guid>(), 1, 10, "CreatedAt", "desc", "all")).ReturnsAsync(pagedList);
+            repoMock.Setup(r => r.GetPagedByClientIdAsync(It.IsAny<long>(), 1, 10, "CreatedAt", "desc", "all")).ReturnsAsync(pagedList);
             repoMock.Setup(r => r.Update(It.IsAny<ApplicationFormEntity>()));
             repoMock.Setup(r => r.SaveChangesAsync()).ReturnsAsync(1);
             var clientRepoMock = new Mock<IClientRepository>();
-            clientRepoMock.Setup(c => c.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(new Client());
+            clientRepoMock.Setup(c => c.GetByIdAsync(It.IsAny<long>())).ReturnsAsync(new Client());
             var mapperMock = new Mock<IMapper>();
-            mapperMock.Setup(m => m.Map<IEnumerable<ApplicationFormListResponseDto>>(It.IsAny<IEnumerable<ApplicationFormEntity>>())).Returns(new[] { new ApplicationFormListResponseDto { Id = Guid.NewGuid() } });
+            mapperMock.Setup(m => m.Map<IEnumerable<ApplicationFormListResponseDto>>(It.IsAny<IEnumerable<ApplicationFormEntity>>())).Returns(new[] { new ApplicationFormListResponseDto { Id = 3L } });
             var logger = new NoopLogger<GetApplicationsPagedByClientIdHandler>();
             var handler = new GetApplicationsPagedByClientIdHandler(repoMock.Object, clientRepoMock.Object, mapperMock.Object, logger);
 
-            var res = await handler.Handle(new GetApplicationsPagedByClientIdQuery { ClientId = System.Guid.NewGuid(), Page = 1, PageSize = 10, SortBy = "CreatedAt", SortOrder = "desc", Status = "all" }, CancellationToken.None);
+            var res = await handler.Handle(new GetApplicationsPagedByClientIdQuery { ClientId = 4L, Page = 1, PageSize = 10, SortBy = "CreatedAt", SortOrder = "desc", Status = "all" }, CancellationToken.None);
             Assert.True(res.Success);
         }
     }

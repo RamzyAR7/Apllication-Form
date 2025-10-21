@@ -4,6 +4,6 @@ namespace Application_Form.Application.Interfaces.Repositories
 {
     public interface IClientRepository
     {
-        Task<Client> GetByIdAsync(Guid clientId);
+        Task<Client> GetByIdAsync(long clientId);
     }
 }

@@ -1,7 +1,6 @@
 using Xunit;
 using FluentValidation.TestHelper;
 using Application_Form.Application.Feature.ApplicatioForm.Command.CreateApplicationForm;
-using System;
 using System.Threading.Tasks;
 using Application_Form.Application.DTOs;
 
@@ -30,7 +29,7 @@ namespace ApplicationForm.Test.Tests.Validators
                     DataRetentionDescription = "Data retained for 1 year.",
                     TechnicalContactName = "Tech Contact",
                     TechnicalContactEmail = "tech@example.com",
-                    ClientId = Guid.NewGuid()
+                    ClientId = 1L
                 }
             );
         }
@@ -218,7 +217,7 @@ namespace ApplicationForm.Test.Tests.Validators
         public async Task Should_Have_Error_When_ClientId_Is_Empty()
         {
             var command = GetValidCommand();
-            command.Dto.ClientId = Guid.Empty;
+            command.Dto.ClientId = 0L;
             var result = await _validator.TestValidateAsync(command);
             result.ShouldHaveValidationErrorFor(x => x.Dto.ClientId);
         }
@@ -243,7 +242,7 @@ namespace ApplicationForm.Test.Tests.Validators
                     DataRetentionDescription = null,
                     TechnicalContactName = null,
                     TechnicalContactEmail = null,
-                    ClientId = Guid.NewGuid()
+                    ClientId = 2L
                 }
             );
             var result = await _validator.TestValidateAsync(command);

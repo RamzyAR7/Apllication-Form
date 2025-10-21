@@ -6,10 +6,10 @@ namespace Application_Form.Application.Feature.ApplicatioForm.Command.UpdateAppl
 {
     public class UpdateApplicationFormCommand : IRequest<Result<CustomEmptyResult>>
     {
-        public Guid Id { get; set; }
+        public long Id { get; set; }
         public UpdateApplicationFormDto Dto { get; set; }
 
-        public UpdateApplicationFormCommand(Guid id, UpdateApplicationFormDto dto)
+        public UpdateApplicationFormCommand(long id, UpdateApplicationFormDto dto)
         {
             Id = id;
             Dto = dto;

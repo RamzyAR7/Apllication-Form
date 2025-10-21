@@ -22,13 +22,13 @@ namespace ApplicationForm.Test.Tests.Handlers
         [Fact]
         public async Task GetPaged_Succeeds()
         {
-            var pagedList = new PaginatedListEntity { Items = new[] { new ApplicationFormEntity { Id = Guid.NewGuid() } }, TotalCount = 1, Page = 1, PageSize = 10 };
+            var pagedList = new PaginatedListEntity { Items = new[] { new ApplicationFormEntity { Id = 1L } }, TotalCount = 1, Page = 1, PageSize = 10 };
             var repoMock = new Mock<IApplicationFormRepository>();
             repoMock.Setup(r => r.GetPagedApplicationsAsync(1, 10, "CreatedAt", "desc", "all")).ReturnsAsync(pagedList);
             repoMock.Setup(r => r.Update(It.IsAny<ApplicationFormEntity>()));
             repoMock.Setup(r => r.SaveChangesAsync()).ReturnsAsync(1);
             var mapperMock = new Mock<IMapper>();
-            mapperMock.Setup(m => m.Map<IEnumerable<ApplicationFormListResponseDto>>(It.IsAny<IEnumerable<ApplicationFormEntity>>())).Returns(new[] { new ApplicationFormListResponseDto { Id = Guid.NewGuid() } });
+            mapperMock.Setup(m => m.Map<IEnumerable<ApplicationFormListResponseDto>>(It.IsAny<IEnumerable<ApplicationFormEntity>>())).Returns(new[] { new ApplicationFormListResponseDto { Id = 2L } });
             var logger = new NoopLogger<GetApplicationsPagedHandler>();
             var handler = new GetApplicationsPagedHandler(repoMock.Object, mapperMock.Object, logger);
 
@@ -46,7 +46,7 @@ namespace ApplicationForm.Test.Tests.Handlers
         {
             var pagedList = new PaginatedListEntity
             {
-                Items = new[] { new ApplicationFormEntity { Id = Guid.NewGuid() } },
+                Items = new[] { new ApplicationFormEntity { Id = 3L } },
                 TotalCount = 15,
                 Page = page,
                 PageSize = pageSize
@@ -54,7 +54,7 @@ namespace ApplicationForm.Test.Tests.Handlers
             var repoMock = new Mock<IApplicationFormRepository>();
             repoMock.Setup(r => r.GetPagedApplicationsAsync(page, pageSize, "ApplicationName", "asc", "all")).ReturnsAsync(pagedList);
             var mapperMock = new Mock<AutoMapper.IMapper>();
-            mapperMock.Setup(m => m.Map<IEnumerable<ApplicationFormListResponseDto>>(It.IsAny<IEnumerable<ApplicationFormEntity>>())).Returns(new[] { new ApplicationFormListResponseDto { Id = Guid.NewGuid() } });
+            mapperMock.Setup(m => m.Map<IEnumerable<ApplicationFormListResponseDto>>(It.IsAny<IEnumerable<ApplicationFormEntity>>())).Returns(new[] { new ApplicationFormListResponseDto { Id = 4L } });
             var logger = new NoopLogger<GetApplicationsPagedHandler>();
             var handler = new GetApplicationsPagedHandler(repoMock.Object, mapperMock.Object, logger);
             var res = await handler.Handle(new GetApplicationsPagedQuery { Page = page, PageSize = pageSize, SortBy = "ApplicationName", SortOrder = "asc", Status = "all" }, CancellationToken.None);

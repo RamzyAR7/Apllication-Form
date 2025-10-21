@@ -7,7 +7,7 @@ namespace Application_Form.Domain.Entities
     public class ApplicationForm
     {
         // Properties
-        public Guid Id { get; set; } = Guid.NewGuid();
+        public long Id { get; set; }
         public string ApplicationName { get; set; }
         public string ApplicationDescription { get; set; }
         public string EmailAddress { get; set; }
@@ -31,7 +31,7 @@ namespace Application_Form.Domain.Entities
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? LastModified { get; set; }
         public DateOnly? ExpirationDate { get; set; }
-        public Guid ClientId { get; set; }
+        public long ClientId { get; set; }
         public string? AdminNotes { get; set; }
         public string? ApiDocsUrl { get; set; }
 

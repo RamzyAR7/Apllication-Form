@@ -12,7 +12,7 @@ namespace ApplicationForm.Test.Tests.Validators
         [Fact]
         public async Task Should_Have_Error_When_Id_Is_Empty()
         {
-            var model = new UpdateApplicationFormCommand(Guid.Empty, new UpdateApplicationFormDto());
+            var model = new UpdateApplicationFormCommand(0L, new UpdateApplicationFormDto());
             var result = await _validator.TestValidateAsync(model);
             result.ShouldHaveValidationErrorFor(x => x.Id);
         }

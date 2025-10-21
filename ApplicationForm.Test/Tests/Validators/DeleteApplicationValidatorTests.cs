@@ -11,7 +11,7 @@ namespace ApplicationForm.Test.Tests.Validators
         [Fact]
         public void Should_Have_Error_When_Id_Is_Empty()
         {
-            var model = new DeleteApplicationCommand(Guid.Empty);
+            var model = new DeleteApplicationCommand(0L);
             var result = _validator.TestValidate(model);
             result.ShouldHaveValidationErrorFor(x => x.Id);
         }

@@ -21,19 +21,19 @@ namespace ApplicationForm.Test.Tests.Handlers
         public async Task GetById_WhenNotFound_ReturnsFailure()
         {
             var repoMock = new Mock<IApplicationFormRepository>();
-            repoMock.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((ApplicationFormEntity)null);
+            repoMock.Setup(r => r.GetByIdAsync(It.IsAny<long>())).ReturnsAsync((ApplicationFormEntity)null);
             var mapperMock = new Mock<IMapper>();
             var logger = new NoopLogger<GetApplicationByIdHandler>();
             var handler = new GetApplicationByIdHandler(repoMock.Object, mapperMock.Object, logger);
 
-            var res = await handler.Handle(new GetApplicationByIdQuery(Guid.NewGuid()), CancellationToken.None);
+            var res = await handler.Handle(new GetApplicationByIdQuery(1L), CancellationToken.None);
             Assert.False(res.Success);
         }
 
         [Fact]
         public async Task GetById_Valid_Succeeds()
         {
-            var ent = new ApplicationFormEntity { Id = Guid.NewGuid(), ApplicationName = "Test" };
+            var ent = new ApplicationFormEntity { Id = 2L, ApplicationName = "Test" };
             var repoMock = new Mock<IApplicationFormRepository>();
             repoMock.Setup(r => r.GetByIdAsync(ent.Id)).ReturnsAsync(ent);
             var mapperMock = new Mock<IMapper>();

@@ -16,18 +16,18 @@ namespace ApplicationForm.Test.Tests.Handlers
         public async Task Delete_WhenNotFound_ReturnsFailure()
         {
             var repoMock = new Mock<IApplicationFormRepository>();
-            repoMock.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((ApplicationFormEntity)null);
+            repoMock.Setup(r => r.GetByIdAsync(It.IsAny<long>())).ReturnsAsync((ApplicationFormEntity)null);
             var logger = new NoopLogger<DeleteApplicationHandler>();
             var handler = new DeleteApplicationHandler(repoMock.Object, logger);
 
-            var res = await handler.Handle(new DeleteApplicationCommand(Guid.NewGuid()), CancellationToken.None);
+            var res = await handler.Handle(new DeleteApplicationCommand(1L), CancellationToken.None);
             Assert.False(res.Success);
         }
 
         [Fact]
         public async Task Delete_WhenAlreadyDeleted_ReturnsFailure()
         {
-            var ent = new ApplicationFormEntity { Id = Guid.NewGuid(), IsDeleted = true };
+            var ent = new ApplicationFormEntity { Id = 2L, IsDeleted = true };
             var repoMock = new Mock<IApplicationFormRepository>();
             repoMock.Setup(r => r.GetByIdAsync(ent.Id)).ReturnsAsync(ent);
             var logger = new NoopLogger<DeleteApplicationHandler>();
@@ -40,7 +40,7 @@ namespace ApplicationForm.Test.Tests.Handlers
         [Fact]
         public async Task Delete_Valid_Succeeds()
         {
-            var ent = new ApplicationFormEntity { Id = Guid.NewGuid(), IsDeleted = false, IsActive = true };
+            var ent = new ApplicationFormEntity { Id = 3L, IsDeleted = false, IsActive = true };
             var repoMock = new Mock<IApplicationFormRepository>();
             repoMock.Setup(r => r.GetByIdAsync(ent.Id)).ReturnsAsync(ent);
             repoMock.Setup(r => r.Update(It.IsAny<ApplicationFormEntity>()));

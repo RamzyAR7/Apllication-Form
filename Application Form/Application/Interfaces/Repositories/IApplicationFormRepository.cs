@@ -6,15 +6,15 @@ namespace Application_Form.Application.Interfaces.Repositories
     public interface IApplicationFormRepository
     {
         // Queries
-        Task<ApplicationForm?> GetByIdAsync(Guid id);
-        Task<ApplicationForm?> GetByNameAndClientIdAsync(string applicationName, Guid clientId);
+        Task<ApplicationForm?> GetByIdAsync(long id);
+        Task<ApplicationForm?> GetByNameAndClientIdAsync(string applicationName, long clientId);
         Task<PaginatedList<ApplicationForm>> GetPagedApplicationsAsync(
             int page,
             int pageSize,
             string sortBy,
             string sortOrder,
             string status);
-        Task<PaginatedList<ApplicationForm>> GetPagedByClientIdAsync(Guid ClientId,
+        Task<PaginatedList<ApplicationForm>> GetPagedByClientIdAsync(long ClientId,
             int page,
             int pageSize,
             string sortBy,

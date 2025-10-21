@@ -24,9 +24,11 @@ namespace Application_Form.Migrations
 
             modelBuilder.Entity("Application_Form.Domain.Entities.ApplicationForm", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<bool>("AcceptTerms")
                         .HasColumnType("bit");
@@ -69,8 +71,8 @@ namespace Application_Form.Migrations
                         .HasColumnType("nvarchar(20)")
                         .HasDefaultValue("Pending");
 
-                    b.Property<Guid>("ClientId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<long>("ClientId")
+                        .HasColumnType("bigint");
 
                     b.Property<int?>("CountryId")
                         .HasColumnType("int");
@@ -157,9 +159,11 @@ namespace Application_Form.Migrations
 
             modelBuilder.Entity("Application_Form.Domain.Entities.Client", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()

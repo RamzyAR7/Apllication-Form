@@ -9,9 +9,9 @@ namespace Application_Form.Application.DTOs
         /// Required
         /// Label: Application ID
         /// Description: Unique identifier for the application.
-        /// Type: Guid
+        /// Type: long
         /// </summary>
-        public Guid Id { get; set; }
+        public long Id { get; set; }
         /// <summary>
         /// Required
         /// Label: Application Name
@@ -172,9 +172,9 @@ namespace Application_Form.Application.DTOs
         /// Required
         /// Label: Client ID
         /// Description: Identifier of the client that owns the application.
-        /// Type: Guid
+        /// Type: long
         /// </summary>
-        public Guid ClientId { get; set; }
+        public long ClientId { get; set; }
         /// <summary>
         /// Required
         /// Label: Client Name

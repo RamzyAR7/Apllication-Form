@@ -12,9 +12,9 @@ namespace Application_Form.Infrastructure.Repositories
         {
             _context = context;
         }
-        public  async Task<Client> GetByIdAsync(Guid clientId)
+        public async Task<Client> GetByIdAsync(long clientId)
         {
-            var client =  await _context.Clients.FindAsync(clientId);
+            var client = await _context.Clients.FindAsync(clientId);
             return client;
         }
     }

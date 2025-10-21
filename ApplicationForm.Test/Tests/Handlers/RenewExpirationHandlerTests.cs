@@ -20,18 +20,18 @@ namespace ApplicationForm.Test.Tests.Handlers
         public async Task RenewExpiration_WhenNotFound_ReturnsFailure()
         {
             var repoMock = new Mock<IApplicationFormRepository>();
-            repoMock.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((ApplicationFormEntity)null);
+            repoMock.Setup(r => r.GetByIdAsync(It.IsAny<long>())).ReturnsAsync((ApplicationFormEntity)null);
             var logger = new NoopLogger<RenewApplicationExpirationDateHandler>();
             var handler = new RenewApplicationExpirationDateHandler(repoMock.Object, logger);
 
-            var res = await handler.Handle(new RenewApplicationExpirationDateCommand(Guid.NewGuid(), DateOnly.FromDateTime(DateTime.UtcNow.AddDays(10))), CancellationToken.None);
+            var res = await handler.Handle(new RenewApplicationExpirationDateCommand(1L, DateOnly.FromDateTime(DateTime.UtcNow.AddDays(10))), CancellationToken.None);
             Assert.False(res.Success);
         }
 
         [Fact]
         public async Task RenewExpiration_WhenInvalidDate_Fails()
         {
-            var ent = new ApplicationFormEntity { Id = System.Guid.NewGuid(), ApprovalStatus = Status.Approved.ToString(), ExpirationDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1)) };
+            var ent = new ApplicationFormEntity { Id = 2L, ApprovalStatus = Status.Approved.ToString(), ExpirationDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1)) };
             var repoMock = new Mock<IApplicationFormRepository>();
             repoMock.Setup(r => r.GetByIdAsync(ent.Id)).ReturnsAsync(ent);
             var logger = new NoopLogger<RenewApplicationExpirationDateHandler>();
@@ -44,7 +44,7 @@ namespace ApplicationForm.Test.Tests.Handlers
         [Fact]
         public async Task RenewExpiration_ValidFutureDate_Succeeds()
         {
-            var ent = new ApplicationFormEntity { Id = System.Guid.NewGuid(), ApprovalStatus = Status.Approved.ToString(), ExpirationDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-10)), IsActive = false };
+            var ent = new ApplicationFormEntity { Id = 3L, ApprovalStatus = Status.Approved.ToString(), ExpirationDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-10)), IsActive = false };
             var repoMock = new Mock<IApplicationFormRepository>();
             repoMock.Setup(r => r.GetByIdAsync(ent.Id)).ReturnsAsync(ent);
             repoMock.Setup(r => r.Update(It.IsAny<ApplicationFormEntity>()));
@@ -64,7 +64,7 @@ namespace ApplicationForm.Test.Tests.Handlers
         [Fact]
         public void Validator_Fails_When_ApplicationId_Is_Empty()
         {
-            var cmd = new RenewApplicationExpirationDateCommand(System.Guid.Empty, DateOnly.FromDateTime(DateTime.UtcNow.AddDays(10)));
+            var cmd = new RenewApplicationExpirationDateCommand(0L, DateOnly.FromDateTime(DateTime.UtcNow.AddDays(10)));
             var validator = new RenewApplicationExpirationDateValidator();
 
             var result = validator.Validate(cmd);
@@ -76,7 +76,7 @@ namespace ApplicationForm.Test.Tests.Handlers
         [Fact]
         public void Validator_Fails_When_NewExpirationDate_Is_Not_Future()
         {
-            var cmd = new RenewApplicationExpirationDateCommand(System.Guid.NewGuid(), DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1)));
+            var cmd = new RenewApplicationExpirationDateCommand(4L, DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1)));
             var validator = new RenewApplicationExpirationDateValidator();
 
             var result = validator.Validate(cmd);
@@ -88,7 +88,7 @@ namespace ApplicationForm.Test.Tests.Handlers
         [Fact]
         public void Validator_Succeeds_For_Valid_Command()
         {
-            var cmd = new RenewApplicationExpirationDateCommand(System.Guid.NewGuid(), DateOnly.FromDateTime(DateTime.UtcNow.AddDays(30)));
+            var cmd = new RenewApplicationExpirationDateCommand(5L, DateOnly.FromDateTime(DateTime.UtcNow.AddDays(30)));
             var validator = new RenewApplicationExpirationDateValidator();
 
             var result = validator.Validate(cmd);

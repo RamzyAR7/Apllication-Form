@@ -6,10 +6,10 @@ namespace Application_Form.Application.Feature.ApplicatioForm.Command.RenewAppli
 {
     public class RenewApplicationExpirationDateCommand: IRequest<Result<CustomEmptyResult>>
     {
-        public Guid ApplicationId { get; set; }
+        public long ApplicationId { get; set; }
         public DateOnly NewExpirationDate { get; set; }
 
-        public RenewApplicationExpirationDateCommand(Guid applicationId, DateOnly newExpirationDate)
+        public RenewApplicationExpirationDateCommand(long applicationId, DateOnly newExpirationDate)
         {
             ApplicationId = applicationId;
             NewExpirationDate = newExpirationDate;

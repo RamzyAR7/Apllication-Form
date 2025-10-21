@@ -6,9 +6,9 @@ namespace Application_Form.Application.Feature.ApplicatioForm.Command.RenewAppli
 {
     public class RenewApplicationCredentialsCommand : IRequest<Result<CustomEmptyResult>>
     {
-        public Guid Id { get; set; }
+        public long Id { get; set; }
 
-        public RenewApplicationCredentialsCommand(Guid id)
+        public RenewApplicationCredentialsCommand(long id)
         {
             Id = id;
         }

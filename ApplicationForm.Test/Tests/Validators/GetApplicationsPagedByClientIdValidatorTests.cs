@@ -11,7 +11,7 @@ namespace ApplicationForm.Test.Tests.Validators
         [Fact]
         public void Should_Have_Error_When_ClientId_Is_Empty()
         {
-            var model = new GetApplicationsPagedByClientIdQuery { ClientId = Guid.Empty };
+            var model = new GetApplicationsPagedByClientIdQuery { ClientId = 0L };
             var result = _validator.TestValidate(model);
             result.ShouldHaveValidationErrorFor(x => x.ClientId);
         }
@@ -19,7 +19,7 @@ namespace ApplicationForm.Test.Tests.Validators
         [Fact]
         public void Should_Not_Have_Error_When_ClientId_Is_Valid()
         {
-            var model = new GetApplicationsPagedByClientIdQuery { ClientId = Guid.NewGuid() };
+            var model = new GetApplicationsPagedByClientIdQuery { ClientId = 1L };
             var result = _validator.TestValidate(model);
             result.ShouldNotHaveValidationErrorFor(x => x.ClientId);
         }

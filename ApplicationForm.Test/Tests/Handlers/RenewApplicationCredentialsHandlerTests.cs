@@ -21,19 +21,19 @@ namespace ApplicationForm.Test.Tests.Handlers
         public async Task RenewCredentials_WhenNotFound_ReturnsFailure()
         {
             var repoMock = new Mock<IApplicationFormRepository>();
-            repoMock.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((ApplicationFormEntity)null);
+            repoMock.Setup(r => r.GetByIdAsync(It.IsAny<long>())).ReturnsAsync((ApplicationFormEntity)null);
             var apiMock = new Mock<IApiCredentialService>();
             var logger = new NoopLogger<RenewApplicationCredentialsHandler>();
             var handler = new RenewApplicationCredentialsHandler(repoMock.Object, apiMock.Object, logger);
 
-            var res = await handler.Handle(new RenewApplicationCredentialsCommand(Guid.NewGuid()), CancellationToken.None);
+            var res = await handler.Handle(new RenewApplicationCredentialsCommand(1L), CancellationToken.None);
             Assert.False(res.Success);
         }
 
         [Fact]
         public async Task RenewCredentials_WhenNotActive_ReturnsFailure()
         {
-            var ent = new ApplicationFormEntity { Id = Guid.NewGuid(), IsActive = false, ApprovalStatus = Status.Approved.ToString() };
+            var ent = new ApplicationFormEntity { Id = 2L, IsActive = false, ApprovalStatus = Status.Approved.ToString() };
             var repoMock = new Mock<IApplicationFormRepository>();
             repoMock.Setup(r => r.GetByIdAsync(ent.Id)).ReturnsAsync(ent);
             var apiMock = new Mock<IApiCredentialService>();
@@ -47,7 +47,7 @@ namespace ApplicationForm.Test.Tests.Handlers
         [Fact]
         public async Task RenewCredentials_WhenNotApproved_ReturnsFailure()
         {
-            var ent = new ApplicationFormEntity { Id = Guid.NewGuid(), IsActive = true, ApprovalStatus = Status.Pending.ToString() };
+            var ent = new ApplicationFormEntity { Id = 3L, IsActive = true, ApprovalStatus = Status.Pending.ToString() };
             var repoMock = new Mock<IApplicationFormRepository>();
             repoMock.Setup(r => r.GetByIdAsync(ent.Id)).ReturnsAsync(ent);
             var apiMock = new Mock<IApiCredentialService>();
@@ -61,7 +61,7 @@ namespace ApplicationForm.Test.Tests.Handlers
         [Fact]
         public async Task RenewCredentials_WhenExpired_ReturnsFailure()
         {
-            var ent = new ApplicationFormEntity { Id = Guid.NewGuid(), IsActive = true, ApprovalStatus = Status.Approved.ToString(), ExpirationDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1)) };
+            var ent = new ApplicationFormEntity { Id = 4L, IsActive = true, ApprovalStatus = Status.Approved.ToString(), ExpirationDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1)) };
             var repoMock = new Mock<IApplicationFormRepository>();
             repoMock.Setup(r => r.GetByIdAsync(ent.Id)).ReturnsAsync(ent);
             var apiMock = new Mock<IApiCredentialService>();
@@ -82,14 +82,14 @@ namespace ApplicationForm.Test.Tests.Handlers
         {
             var ent = new ApplicationFormEntity
             {
-                Id = Guid.NewGuid(),
+                Id = 5L,
                 ApplicationName = "A",
                 ApplicationDescription = "D",
                 EmailAddress = "a@a.com",
                 OrganizationName = "Org",
                 ApplicationType = "Web",
                 Environment = ApiEnvironment.Sandbox.ToString(),
-                ClientId = Guid.NewGuid(),
+                ClientId = 6L,
                 IsActive = isActive,
                 ApprovalStatus = approvalStatus,
                 AcceptTerms = true,
@@ -109,7 +109,7 @@ namespace ApplicationForm.Test.Tests.Handlers
         [Fact]
         public async Task RenewCredentials_Valid_Succeeds()
         { 
-            var ent = new ApplicationFormEntity { Id = Guid.NewGuid(), IsActive = true, ApprovalStatus = Status.Approved.ToString(), ExpirationDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(10)) };
+            var ent = new ApplicationFormEntity { Id = 7L, IsActive = true, ApprovalStatus = Status.Approved.ToString(), ExpirationDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(10)) };
             var repoMock = new Mock<IApplicationFormRepository>();
             repoMock.Setup(r => r.GetByIdAsync(ent.Id)).ReturnsAsync(ent);
             repoMock.Setup(r => r.Update(It.IsAny<ApplicationFormEntity>()));

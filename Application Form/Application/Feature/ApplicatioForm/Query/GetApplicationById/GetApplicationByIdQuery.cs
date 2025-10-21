@@ -6,8 +6,8 @@ namespace Application_Form.Application.Feature.ApplicatioForm.Query.GetApplicati
 {
     public class GetApplicationByIdQuery: IRequest<Result<ApplicationFormResponseDto>>
     {
-        public Guid Id { get; set; }
-        public GetApplicationByIdQuery(Guid id)
+        public long Id { get; set; }
+        public GetApplicationByIdQuery(long id)
         {
             Id = id;
         }

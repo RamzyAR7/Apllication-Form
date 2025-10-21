@@ -116,9 +116,9 @@ namespace Application_Form.Application.DTOs
         /// <summary>
         /// Required
         /// Label: Client ID
-        /// Description: The client identifier (GUID) associated with this application.
-        /// Type: Guid
+        /// Description: The client identifier (long) associated with this application.
+        /// Type: long
         /// </summary>
-        public Guid ClientId { get; set; }
+        public long ClientId { get; set; }
     }
 }

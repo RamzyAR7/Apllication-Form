@@ -68,14 +68,13 @@ using (var scope = app.Services.CreateScope())
     if (!context.Clients.Any())
     {
         context.Clients.AddRange(
-            new Client { Id = Guid.NewGuid(), Name = "Bank Misr" },
-            new Client { Id = Guid.NewGuid(), Name = "QNB" },
-            new Client { Id = Guid.NewGuid(), Name = "CIB" }
+            new Client { Name = "Bank Misr" },
+            new Client { Name = "QNB" },
+            new Client { Name = "CIB" }
         );
         context.SaveChanges();
     }
 }
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

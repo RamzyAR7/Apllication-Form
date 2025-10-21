@@ -6,9 +6,9 @@ namespace Application_Form.Application.Feature.ApplicatioForm.Command.DeleteAppl
 {
     public class DeleteApplicationCommand : IRequest<Result<CustomEmptyResult>>
     {
-        public Guid Id { get; set; }
+        public long Id { get; set; }
 
-        public DeleteApplicationCommand(Guid id)
+        public DeleteApplicationCommand(long id)
         {
             Id = id;
         }

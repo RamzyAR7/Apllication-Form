@@ -18,7 +18,7 @@ namespace Application_Form.Infrastructure.Repositories
         }
 
         #region Query Methods
-        public async Task<ApplicationForm?> GetByIdAsync(Guid id)
+        public async Task<ApplicationForm?> GetByIdAsync(long id)
         {
             return await _context.ApplicationForms
                 .Include(a => a.Client)
@@ -26,7 +26,7 @@ namespace Application_Form.Infrastructure.Repositories
 
         }
 
-        public async Task<ApplicationForm?> GetByNameAndClientIdAsync(string applicationName, Guid clientId)
+        public async Task<ApplicationForm?> GetByNameAndClientIdAsync(string applicationName, long clientId)
         {
             return await _context.ApplicationForms
                 .FirstOrDefaultAsync(a => a.ApplicationName == applicationName && a.ClientId == clientId && !a.IsDeleted);
@@ -60,7 +60,7 @@ namespace Application_Form.Infrastructure.Repositories
             };
         }
 
-        public async Task<PaginatedList<ApplicationForm>> GetPagedByClientIdAsync(Guid ClientId, int page, int pageSize, string sortBy, string sortOrder, string status)
+        public async Task<PaginatedList<ApplicationForm>> GetPagedByClientIdAsync(long ClientId, int page, int pageSize, string sortBy, string sortOrder, string status)
         {
             var query = _context.ApplicationForms
               .Include(a => a.Client)

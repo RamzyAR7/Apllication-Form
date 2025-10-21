@@ -12,7 +12,7 @@ namespace ApplicationForm.Test.Tests.Validators
         [Fact]
         public void Should_Have_Error_When_ApplicationId_Is_Empty()
         {
-            var model = new RenewApplicationExpirationDateCommand(Guid.Empty, DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1)));
+            var model = new RenewApplicationExpirationDateCommand(0L, DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1)));
             var result = _validator.TestValidate(model);
             result.ShouldHaveValidationErrorFor(x => x.ApplicationId);
         }

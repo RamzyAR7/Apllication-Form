@@ -7,7 +7,7 @@ namespace Application_Form.Application.Feature.ApplicatioForm.Query.GetApplicati
 {
     public class GetApplicationsPagedByClientIdQuery : IRequest<Result<PaginatedList<ApplicationFormListResponseDto>>>
     {
-        public Guid ClientId { get; set; }
+        public long ClientId { get; set; }
         public int Page { get; set; } = 1;
         public int PageSize { get; set; } = 10;
         public string SortBy { get; set; } = "CreatedAt";
